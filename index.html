@@ -501,369 +501,301 @@ function loadRecent(code){
 const API_KEY='edb_b771a469ac4f384492ccd80177bb10d1';
 const BASE='https://edinetdb.jp/v1';
 
-// ─── Curated peer DB with descriptions & scale ───────────
-const PEER_DB={
-  saas_cloud:{label:'SaaS / クラウドソフトウェア',subs:{
-    saas_hr:{label:'SaaS / 人事・HR・勤怠管理',peers:[
-      {t:'4435',n:'カオナビ',desc:'タレントマネジメント・人材可視化SaaS。HR情報を一元管理。',scale:'小型　売上¥7B程度'},
-      {t:'4193',n:'チームスピリット',desc:'勤怠・工数・経費管理を統合したSaaS。上場企業向け。',scale:'小型　売上¥2B程度'},
-      {t:'4478',n:'freee',desc:'クラウド会計・HR・給与計算SaaS。中小企業向け主力。',scale:'中型　売上¥30B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'会計・経費・給与・税務など業務系SaaS群。法人・個人向け。',scale:'中型　売上¥50B程度'},
-      {t:'3923',n:'ラクス',desc:'楽楽精算・楽楽明細など経費・請求書SaaS。黒字高成長。',scale:'大型　売上¥49B程度'},
-      {t:'4448',n:'Chatwork',desc:'中小企業向けビジネスチャットSaaS。HR連携機能も拡充。',scale:'小型　売上¥8B程度'},
-      {t:'4484',n:'ランサーズ',desc:'フリーランスマッチング・タレントソリューション。',scale:'小型　売上¥5B程度'},
-      {t:'4776',n:'サイボウズ',desc:'グループウェア・kintone（業務アプリ構築SaaS）。',scale:'中型　売上¥24B程度'},
-      {t:'4431',n:'スマレジ',desc:'クラウドPOS・店舗管理SaaS。飲食・小売に強み。',scale:'中型　売上¥11B程度'},
-      {t:'4443',n:'Sansan',desc:'法人向け名刺管理・営業DXSaaS。Eight個人版も展開。',scale:'中型　売上¥28B程度'},
-    ]},
-    saas_accounting:{label:'SaaS / 会計・経費・バックオフィス',peers:[
-      {t:'4478',n:'freee',desc:'中小企業向けクラウド会計・確定申告・給与SaaS。',scale:'中型　売上¥30B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'法人向け会計・経費・請求書SaaS群。金融サービスも展開。',scale:'中型　売上¥50B程度'},
-      {t:'3923',n:'ラクス',desc:'楽楽精算・楽楽明細。経費精算・請求書SaaSで国内首位級。',scale:'大型　売上¥49B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintone（ノーコード）・ガルーンなど業務系SaaS。',scale:'中型　売上¥24B程度'},
-      {t:'4193',n:'チームスピリット',desc:'勤怠・工数・経費を一元管理。上場企業の内製化需要取込み。',scale:'小型　売上¥2B程度'},
-      {t:'3769',n:'GMOペイメントゲートウェイ',desc:'決済・請求書・入金消込のBtoB決済インフラ。',scale:'大型　売上¥100B以上'},
-      {t:'4448',n:'Chatwork',desc:'ビジネスチャット。中小企業の社内コミュニケーション基盤。',scale:'小型　売上¥8B程度'},
-      {t:'4443',n:'Sansan',desc:'請求書受領・Bill Oneも展開。バックオフィスDX全方位。',scale:'中型　売上¥28B程度'},
-      {t:'4484',n:'ランサーズ',desc:'フリーランス活用・業務委託プラットフォーム。',scale:'小型　売上¥5B程度'},
-      {t:'4431',n:'スマレジ',desc:'POSレジ・在庫・会計連携SaaS。小売・飲食向け。',scale:'中型　売上¥11B程度'},
-    ]},
-    saas_crm:{label:'SaaS / CRM・SFA・営業支援',peers:[
-      {t:'4443',n:'Sansan',desc:'名刺管理・SFA・営業リスト生成SaaS。エンタープライズ向け。',scale:'中型　売上¥28B程度'},
-      {t:'4165',n:'プレイド',desc:'顧客体験（CX）解析SaaS「KARTE」。WebアクセスAI分析。',scale:'中型　売上¥13B程度'},
-      {t:'4443',n:'Sansan',desc:'法人向け名刺・営業DX。Bill Oneで請求書領域も拡大。',scale:'中型　売上¥28B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'会計・経費・請求書・給与など多機能SaaS群。',scale:'中型　売上¥50B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintone・ガルーン・Mailwise。中小〜大企業向けSaaS。',scale:'中型　売上¥24B程度'},
-      {t:'4448',n:'Chatwork',desc:'ビジネスチャット。社内外コミュニケーションSaaS。',scale:'小型　売上¥8B程度'},
-      {t:'4185',n:'ウォンテッドリー',desc:'採用・社員エンゲージメントSaaS。スタートアップ向け。',scale:'小型　売上¥3B程度'},
-      {t:'4431',n:'スマレジ',desc:'POS・顧客管理・在庫管理SaaS。小売・外食向け。',scale:'中型　売上¥11B程度'},
-      {t:'4484',n:'ランサーズ',desc:'フリーランスマッチング・プロジェクト管理。',scale:'小型　売上¥5B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'AIテキスト分析・SNS分析・社内BI SaaS。',scale:'小型　売上¥2B程度'},
-    ]},
-    saas_security:{label:'SaaS / セキュリティ・認証・ゼロトラスト',peers:[
-      {t:'4475',n:'HENNGE',desc:'クラウドセキュリティ・ID管理・メールSaaS「HENNGE One」。',scale:'中型　売上¥11B程度'},
-      {t:'4493',n:'サイバーセキュリティクラウド',desc:'Webサイト攻撃防御・WAASaaS。中小企業向け。',scale:'小型　売上¥3B程度'},
-      {t:'3778',n:'さくらインターネット',desc:'クラウドインフラ・セキュリティ・データセンター。',scale:'中型　売上¥25B程度'},
-      {t:'3996',n:'サーバーワークス',desc:'AWS専業クラウドインテグレーター。MSP事業も拡大。',scale:'小型　売上¥10B程度'},
-      {t:'4478',n:'freee',desc:'会計・給与クラウドSaaS。セキュリティ認証取得多数。',scale:'中型　売上¥30B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintone・ガルーンのクラウド基盤。セキュリティ強固。',scale:'中型　売上¥24B程度'},
-      {t:'4448',n:'Chatwork',desc:'ビジネスチャットSaaS。エンドツーエンド暗号化対応。',scale:'小型　売上¥8B程度'},
-      {t:'3774',n:'インターネットイニシアティブ',desc:'IIJ。法人向けネット回線・セキュリティ・クラウド。',scale:'大型　売上¥250B以上'},
-      {t:'4485',n:'JTOWER',desc:'通信インフラシェアリング。5G基地局等を運営。',scale:'小型　売上¥4B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'AI分析・チャットボット・テキスト解析SaaS。',scale:'小型　売上¥2B程度'},
-    ]},
-    saas_ai:{label:'SaaS / AI・データ分析',peers:[
-      {t:'4165',n:'プレイド',desc:'顧客行動解析AI「KARTE」。Webリアルタイムパーソナライズ。',scale:'中型　売上¥13B程度'},
-      {t:'4418',n:'JDSC',desc:'製造・流通向けAIソリューション。DX推進SaaS。',scale:'小型　売上¥2B程度'},
-      {t:'4407',n:'Appier Group',desc:'マーケティングAI SaaS。APAC展開。行動予測・広告最適化。',scale:'中型　売上¥15B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'AI自然言語処理・SNS分析・チャットボット。BtoB向け。',scale:'小型　売上¥2B程度'},
-      {t:'4493',n:'サイバーセキュリティクラウド',desc:'AI活用Webセキュリティ・攻撃検知SaaS。',scale:'小型　売上¥3B程度'},
-      {t:'4475',n:'HENNGE',desc:'SaaS管理・ゼロトラストセキュリティ・AI活用認証。',scale:'中型　売上¥11B程度'},
-      {t:'4478',n:'freee',desc:'AI活用の会計・税務自動化。中小企業のDX加速。',scale:'中型　売上¥30B程度'},
-      {t:'4443',n:'Sansan',desc:'名刺OCR・AIデータ補完。営業AIの先駆け。',scale:'中型　売上¥28B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'AI会計仕訳・経費自動処理。FinTech×AI融合。',scale:'中型　売上¥50B程度'},
-      {t:'3923',n:'ラクス',desc:'OCR×AI経費精算自動化。BPO事業も展開。',scale:'大型　売上¥49B程度'},
-    ]},
-    saas_pos_retail:{label:'SaaS / POS・小売DX・店舗管理',peers:[
-      {t:'4431',n:'スマレジ',desc:'クラウドPOS・在庫・CRM SaaS。飲食・アパレル・小売向け。',scale:'中型　売上¥11B程度'},
-      {t:'4256',n:'サインド',desc:'不動産仲介DX SaaS。契約・内見管理のデジタル化。',scale:'小型　売上¥2B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintoneで在庫・発注管理アプリを柔軟に構築可能。',scale:'中型　売上¥24B程度'},
-      {t:'3923',n:'ラクス',desc:'楽楽精算・経費管理SaaS。卸・小売の間接費DX。',scale:'大型　売上¥49B程度'},
-      {t:'4193',n:'チームスピリット',desc:'シフト管理・勤怠・工数。アルバイト多店舗に強み。',scale:'小型　売上¥2B程度'},
-      {t:'3769',n:'GMOペイメントゲートウェイ',desc:'EC・店舗向け決済ゲートウェイ。QRコード・後払い対応。',scale:'大型　売上¥100B以上'},
-      {t:'4185',n:'ウォンテッドリー',desc:'採用SaaS。小売・飲食チェーンの採用DXにも活用。',scale:'小型　売上¥3B程度'},
-      {t:'4448',n:'Chatwork',desc:'店舗スタッフ向けコミュニケーションSaaS。',scale:'小型　売上¥8B程度'},
-      {t:'4478',n:'freee',desc:'クラウド会計・POS連携。個人事業主〜中小向け。',scale:'中型　売上¥30B程度'},
-      {t:'4443',n:'Sansan',desc:'BtoB取引先管理・請求書DXで小売・卸業界にも展開。',scale:'中型　売上¥28B程度'},
-    ]},
-    saas_proptech:{label:'SaaS / 不動産テック・PropTech',peers:[
-      {t:'4256',n:'サインド',desc:'不動産仲介向けDX SaaS。内見・契約・管理をデジタル化。',scale:'小型　売上¥2B程度'},
-      {t:'4165',n:'プレイド',desc:'CX解析AI。不動産ポータルのCVR改善にも活用。',scale:'中型　売上¥13B程度'},
-      {t:'3996',n:'サーバーワークス',desc:'不動産業界向けクラウドMSP。AWS移行支援。',scale:'小型　売上¥10B程度'},
-      {t:'4478',n:'freee',desc:'不動産管理会社向けクラウド会計・確定申告。',scale:'中型　売上¥30B程度'},
-      {t:'4443',n:'Sansan',desc:'不動産会社向け名刺・顧客管理・営業DXSaaS。',scale:'中型　売上¥28B程度'},
-      {t:'4185',n:'ウォンテッドリー',desc:'不動産スタートアップの採用プラットフォーム。',scale:'小型　売上¥3B程度'},
-      {t:'4448',n:'Chatwork',desc:'不動産会社内コミュニケーション・物件情報共有SaaS。',scale:'小型　売上¥8B程度'},
-      {t:'4431',n:'スマレジ',desc:'店舗（ショールーム）管理・来客対応SaaSとして活用。',scale:'中型　売上¥11B程度'},
-      {t:'3923',n:'ラクス',desc:'不動産会社の経費精算・請求書DX。',scale:'大型　売上¥49B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintoneで不動産管理・物件情報システムを構築。',scale:'中型　売上¥24B程度'},
-    ]},
-    saas_cloud_infra:{label:'SaaS / クラウドインフラ・業務効率化',peers:[
-      {t:'3778',n:'さくらインターネット',desc:'国内クラウド・VPS・データセンター。AI向け高火力GPUも。',scale:'中型　売上¥25B程度'},
-      {t:'3996',n:'サーバーワークス',desc:'AWS専業クラウドMSP。国内有数のAWSリセラー。',scale:'小型　売上¥10B程度'},
-      {t:'4475',n:'HENNGE',desc:'SaaS管理・ID統合・セキュリティクラウド。',scale:'中型　売上¥11B程度'},
-      {t:'4776',n:'サイボウズ',desc:'グループウェア・kintone。国内クラウド業務基盤の老舗。',scale:'中型　売上¥24B程度'},
-      {t:'4448',n:'Chatwork',desc:'国内中小企業向けビジネスチャットSaaS最大手の一角。',scale:'小型　売上¥8B程度'},
-      {t:'3774',n:'インターネットイニシアティブ',desc:'法人向けネット回線・クラウド・セキュリティ総合。',scale:'大型　売上¥250B以上'},
-      {t:'4485',n:'JTOWER',desc:'5G基地局・通信インフラシェアリング事業者。',scale:'小型　売上¥4B程度'},
-      {t:'4493',n:'サイバーセキュリティクラウド',desc:'クラウドWAF・セキュリティSaaS。中小企業向け。',scale:'小型　売上¥3B程度'},
-      {t:'3923',n:'ラクス',desc:'経費・請求書・電子帳票SaaS。BPO基盤も展開。',scale:'大型　売上¥49B程度'},
-      {t:'4478',n:'freee',desc:'クラウド会計・給与。APIエコシステムで連携拡大。',scale:'中型　売上¥30B程度'},
-    ]},
-  }},
-  it_platform:{label:'IT プラットフォーム・マーケットプレイス',subs:{
-    platform_marketplace:{label:'プラットフォーム / マッチング・マーケットプレイス',peers:[
-      {t:'4484',n:'ランサーズ',desc:'フリーランスマッチング国内最大手。企業の外部人材活用。',scale:'小型　売上¥5B程度'},
-      {t:'3900',n:'クラウドワークス',desc:'クラウドソーシング・副業マッチング。登録者最大規模。',scale:'小型　売上¥5B程度'},
-      {t:'4443',n:'Sansan',desc:'名刺管理からBtoB営業マッチングへ展開。',scale:'中型　売上¥28B程度'},
-      {t:'2371',n:'カカクコム',desc:'価格比較・食べログ・食ログ。国内最大級の情報マーケット。',scale:'大型　売上¥60B程度'},
-      {t:'4385',n:'メルカリ',desc:'CtoC・BtoC二次流通マーケットプレイス。月間利用者最大級。',scale:'大型　売上¥200B以上'},
-      {t:'4185',n:'ウォンテッドリー',desc:'採用・ビジネスSNS。スタートアップ・IT企業での認知高い。',scale:'小型　売上¥3B程度'},
-      {t:'4448',n:'Chatwork',desc:'ビジネスチャット。中小企業間の外注コミュニケーション基盤。',scale:'小型　売上¥8B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'SNS分析・チャットボット。BtoBデータプラットフォーム。',scale:'小型　売上¥2B程度'},
-      {t:'4165',n:'プレイド',desc:'CX解析SaaS。マーケットプレイスのCVR改善に活用。',scale:'中型　売上¥13B程度'},
-      {t:'4478',n:'freee',desc:'中小企業の会計・給与管理プラットフォーム。',scale:'中型　売上¥30B程度'},
-    ]},
-    platform_hrtech:{label:'プラットフォーム / 採用・HRテック',peers:[
-      {t:'4185',n:'ウォンテッドリー',desc:'スタートアップ・IT企業向け採用SNS。共感採用に特化。',scale:'小型　売上¥3B程度',alt:'Wantedly'},
-      {t:'4484',n:'ランサーズ',desc:'フリーランス活用・業務委託マッチング。人材ソリューション。',scale:'小型　売上¥5B程度'},
-      {t:'3900',n:'クラウドワークス',desc:'副業・フリーランスマッチング。中小企業の外注ニーズに対応。',scale:'小型　売上¥5B程度'},
-      {t:'4435',n:'カオナビ',desc:'タレントマネジメント。人材情報を「顔と名前」で一元可視化。',scale:'小型　売上¥7B程度',noEdinet:true},
-      {t:'4193',n:'チームスピリット',desc:'勤怠・工数・シフト管理。労務DXの中堅SaaS。',scale:'小型　売上¥2B程度'},
-      {t:'4448',n:'Chatwork',desc:'採用担当者の社内外コミュニケーション基盤として活用。',scale:'小型　売上¥8B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'給与・社会保険・採用連携。HR SaaS群を展開。',scale:'中型　売上¥50B程度'},
-      {t:'4478',n:'freee',desc:'採用〜給与計算まで一貫した中小企業向けHR SaaS。',scale:'中型　売上¥30B程度'},
-      {t:'4776',n:'サイボウズ',desc:'人事・勤怠管理アプリをkintoneで構築可能。',scale:'中型　売上¥24B程度'},
-      {t:'3923',n:'ラクス',desc:'経費・楽楽勤怠。バックオフィスHR DX SaaS。',scale:'大型　売上¥49B程度'},
-    ]},
-  }},
-  fintech:{label:'FinTech・金融テック',subs:{
-    fintech_payment:{label:'FinTech / 決済・送金・給与',peers:[
-      {t:'3769',n:'GMOペイメントゲートウェイ',desc:'EC・店舗決済ゲートウェイ国内最大手。後払い・BtoB決済も。',scale:'大型　売上¥100B以上'},
-      {t:'4385',n:'メルカリ',desc:'メルペイ・コード決済・後払い。CtoC決済プラットフォーム。',scale:'大型　売上¥200B以上'},
-      {t:'3994',n:'マネーフォワード',desc:'給与前払い・経費精算・BtoB決済SaaS群。',scale:'中型　売上¥50B程度'},
-      {t:'4478',n:'freee',desc:'中小企業向け会計・請求書・給与SaaS。クラウド完結。',scale:'中型　売上¥30B程度'},
-      {t:'4193',n:'チームスピリット',desc:'給与前払い・工数連動給与管理。中小企業向け。',scale:'小型　売上¥2B程度'},
-      {t:'3923',n:'ラクス',desc:'電子請求書・入金消込・振込SaaS。BtoB決済自動化。',scale:'大型　売上¥49B程度'},
-      {t:'4443',n:'Sansan',desc:'Bill One（請求書受領）。支払・入金管理のDX。',scale:'中型　売上¥28B程度'},
-      {t:'4448',n:'Chatwork',desc:'フリーランスへの業務委託・支払コミュニケーション基盤。',scale:'小型　売上¥8B程度'},
-      {t:'4485',n:'JTOWER',desc:'通信インフラ事業。インフラ系資産ファイナンス事業者。',scale:'小型　売上¥4B程度'},
-      {t:'4165',n:'プレイド',desc:'決済完了後のCX改善AI。EC転換率向上SaaS。',scale:'中型　売上¥13B程度'},
-    ]},
-    fintech_lending:{label:'FinTech / 融資・与信・保険テック',peers:[
-      {t:'3994',n:'マネーフォワード',desc:'中小企業向けFintechローン・補助金申請SaaS。',scale:'中型　売上¥50B程度'},
-      {t:'4478',n:'freee',desc:'会計データを活用した融資審査連携。金融機関API接続。',scale:'中型　売上¥30B程度'},
-      {t:'8771',n:'イー・ギャランティ',desc:'売掛金保証・信用リスク移転。BtoB与信サービス。',scale:'中型　売上¥10B程度'},
-      {t:'8698',n:'マネックスグループ',desc:'ネット証券・仮想通貨・資産管理。FintechとITの融合。',scale:'大型　売上¥80B程度'},
-      {t:'7148',n:'FPG',desc:'オペレーティングリース・節税スキーム。',scale:'中型　売上¥15B程度'},
-      {t:'4165',n:'プレイド',desc:'金融機関のデジタルCX改善SaaS。',scale:'中型　売上¥13B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'AIチャットボットで金融顧客対応自動化。',scale:'小型　売上¥2B程度'},
-      {t:'4407',n:'Appier Group',desc:'金融機関向けAIマーケティング・与信スコアリング。',scale:'中型　売上¥15B程度'},
-      {t:'4443',n:'Sansan',desc:'金融機関の名刺・顧客管理DXSaaS。',scale:'中型　売上¥28B程度'},
-      {t:'4418',n:'JDSC',desc:'AI与信スコアリング・需要予測SaaS。',scale:'小型　売上¥2B程度'},
-    ]},
-  }},
-  healthcare_dx:{label:'ヘルスケア DX・医療 IT',subs:{
-    health_digital:{label:'ヘルスケア / デジタルヘルス・医療DX',peers:[
-      {t:'4480',n:'メドレー',desc:'医療介護求人・オンライン診療・医療SaaS（CLINICS）。',scale:'中型　売上¥15B程度'},
-      {t:'3902',n:'メドピア',desc:'医師向け情報プラットフォーム・PHR・治験DX。',scale:'小型　売上¥5B程度'},
-      {t:'4418',n:'JDSC',desc:'医療・ヘルスケア向けAI需要予測・データ活用SaaS。',scale:'小型　売上¥2B程度'},
-      {t:'4407',n:'Appier Group',desc:'ヘルスケア企業向けAIマーケティング最適化SaaS。',scale:'中型　売上¥15B程度'},
-      {t:'4165',n:'プレイド',desc:'医療機関・薬局のCX改善・患者体験向上SaaS。',scale:'中型　売上¥13B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'医療チャットボット・AIカスタマーサポート。',scale:'小型　売上¥2B程度'},
-      {t:'4493',n:'サイバーセキュリティクラウド',desc:'医療機関向けセキュリティSaaS。',scale:'小型　売上¥3B程度'},
-      {t:'4478',n:'freee',desc:'医療法人・クリニック向けクラウド会計・給与。',scale:'中型　売上¥30B程度'},
-      {t:'3994',n:'マネーフォワード',desc:'医療介護向け経費・給与・請求書SaaS群。',scale:'中型　売上¥50B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintoneで院内業務・シフト・患者管理を構築可能。',scale:'中型　売上¥24B程度'},
-    ]},
-    health_pharma:{label:'医薬品 / 大手製薬',peers:[
-      {t:'4502',n:'武田薬品工業',desc:'日本最大手製薬。グローバル展開・希少疾患・オンコロジー。',scale:'超大型　売上¥4.5T以上'},
-      {t:'4519',n:'中外製薬',desc:'ロシュ傘下。抗体医薬・バイオ医薬で高収益。',scale:'超大型　売上¥1T以上'},
-      {t:'4568',n:'第一三共',desc:'ADC（抗体薬物複合体）で世界注目。グローバル成長中。',scale:'超大型　売上¥1.7T以上'},
-      {t:'4523',n:'エーザイ',desc:'アルツハイマー治療薬レケンビで世界展開。',scale:'大型　売上¥700B以上'},
-      {t:'4507',n:'塩野義製薬',desc:'感染症・中枢神経系薬。コロナ経口薬も展開。',scale:'大型　売上¥400B以上'},
-      {t:'4506',n:'住友ファーマ',desc:'神経系・泌尿器科薬。住友化学グループ。',scale:'大型　売上¥200B以上'},
-      {t:'4151',n:'協和キリン',desc:'バイオ医薬・腎領域・がん領域に特化。',scale:'大型　売上¥400B以上'},
-      {t:'4540',n:'ツムラ',desc:'漢方製剤国内最大手。保険適用漢方薬を製造販売。',scale:'中型　売上¥100B以上'},
-      {t:'4565',n:'そーせいグループ',desc:'GPCRアゴニスト創薬。導出ロイヤリティ収益モデル。',scale:'小型　時価総額¥100B程度'},
-      {t:'4563',n:'アンジェス',desc:'遺伝子治療・DNAワクチン開発バイオベンチャー。',scale:'小型　売上¥1B未満'},
-    ]},
-  }},
-  retail_ec:{label:'小売・EC・D2C',subs:{
-    ec_marketplace:{label:'EC / ネット通販・マーケットプレイス',peers:[
-      {t:'4385',n:'メルカリ',desc:'CtoC・BtoC二次流通プラットフォーム。月間ユーザー2000万超。',scale:'大型　売上¥200B以上'},
-      {t:'3092',n:'ZOZO',desc:'ファッションEC「ZOZOTOWN」運営。計測技術・D2C支援。',scale:'大型　売上¥200B以上'},
-      {t:'2371',n:'カカクコム',desc:'価格比較・食べログ。メディア×EC送客プラットフォーム。',scale:'大型　売上¥60B程度'},
-      {t:'2491',n:'バリューコマース',desc:'アフィリエイト・EC支援・マーケティングSaaS。',scale:'中型　売上¥25B程度'},
-      {t:'3769',n:'GMOペイメントゲートウェイ',desc:'EC決済インフラ。ショッピング後払い・サブスク課金も。',scale:'大型　売上¥100B以上'},
-      {t:'4165',n:'プレイド',desc:'ECサイトのリアルタイムCX改善AI SaaS「KARTE」。',scale:'中型　売上¥13B程度'},
-      {t:'4407',n:'Appier Group',desc:'ECサイト向けAIレコメンド・ターゲティング広告最適化。',scale:'中型　売上¥15B程度'},
-      {t:'3998',n:'ソウルドアウト',desc:'中小EC向けデジタルマーケティング支援。広告運用代行。',scale:'小型　売上¥30B程度'},
-      {t:'3843',n:'フリービット',desc:'EC・ネット回線・IoT。中小企業のデジタル化支援。',scale:'小型　売上¥25B程度'},
-      {t:'4185',n:'ウォンテッドリー',desc:'EC・D2C企業の採用プラットフォーム。',scale:'小型　売上¥3B程度'},
-    ]},
-  }},
-  manufacturing_tech:{label:'製造業・電子部品',subs:{
-    mfg_semiconductor:{label:'製造 / 半導体・電子部品',peers:[
-      {t:'6723',n:'ルネサスエレクトロニクス',desc:'マイコン・SoCで世界首位級。自動車・産業向け半導体。',scale:'超大型　売上¥1.5T以上'},
-      {t:'6981',n:'村田製作所',desc:'積層セラミックコンデンサ（MLCC）世界首位。スマホ部品。',scale:'超大型　売上¥1.5T以上'},
-      {t:'6857',n:'アドバンテスト',desc:'半導体テスター世界最大手。AI半導体テスト需要急増。',scale:'超大型　時価総額¥5T以上'},
-      {t:'8035',n:'東京エレクトロン',desc:'半導体製造装置国内最大手・世界3位。前工程装置。',scale:'超大型　売上¥2T以上'},
-      {t:'6954',n:'ファナック',desc:'産業用ロボット・CNC装置世界最大手。工場自動化。',scale:'超大型　売上¥800B以上'},
-      {t:'6861',n:'キーエンス',desc:'センサー・FA機器で高利益率。世界最高水準のROE。',scale:'超大型　売上¥900B以上'},
-      {t:'6976',n:'太陽誘電',desc:'MLCC・インダクタ・フィルタ。村田と並ぶ電子部品大手。',scale:'大型　売上¥300B以上'},
-      {t:'6762',n:'TDK',desc:'磁性材料・電源・センサー。IoT・EV部品に強み。',scale:'超大型　売上¥2T以上'},
-      {t:'6770',n:'アルプスアルパイン',desc:'コンポーネント・車載部品。スイッチ・通信モジュール。',scale:'大型　売上¥800B以上'},
-      {t:'6971',n:'京セラ',desc:'セラミック部品・通信機器・プリンタ。多角的製造業。',scale:'超大型　売上¥2T以上'},
-    ]},
-    mfg_auto:{label:'製造 / 自動車・輸送機器',peers:[
-      {t:'7203',n:'トヨタ自動車',desc:'世界最大の完成車メーカー。HV・EV・水素に総力投資。',scale:'超大型　売上¥45T以上'},
-      {t:'7267',n:'本田技研工業',desc:'二輪・四輪・航空機エンジン。EV・ソフトウェア定義車両へ転換。',scale:'超大型　売上¥20T以上'},
-      {t:'7201',n:'日産自動車',desc:'EVリーフ・軽EV「サクラ」。ルノーと資本関係再構築中。',scale:'超大型　売上¥12T以上'},
-      {t:'7261',n:'マツダ',desc:'魂動デザイン・スカイアクティブ技術。EV・PHEV展開中。',scale:'大型　売上¥4T以上'},
-      {t:'7270',n:'SUBARU',desc:'AWD・安全技術アイサイト。米国市場依存度高い。',scale:'大型　売上¥4T以上'},
-      {t:'7272',n:'ヤマハ発動機',desc:'二輪・マリン・ROV。新興国二輪と先進国マリン二本柱。',scale:'大型　売上¥2T以上'},
-      {t:'7269',n:'スズキ',desc:'インド四輪最大手マルチスズキを保有。軽自動車国内首位。',scale:'大型　売上¥4T以上'},
-      {t:'7259',n:'アイシン',desc:'トヨタ系部品大手。トランスミッション・ブレーキ・シート。',scale:'超大型　売上¥4T以上'},
-      {t:'7276',n:'小糸製作所',desc:'車載照明（ヘッドランプ）世界首位。EV向け需要拡大。',scale:'大型　売上¥700B以上'},
-      {t:'6201',n:'豊田自動織機',desc:'フォークリフト世界首位。トヨタ系。エンジン供給も。',scale:'超大型　売上¥3T以上'},
-    ]},
-  }},
-  real_estate:{label:'不動産・建設テック',subs:{
-    re_residential:{label:'不動産 / 住宅・マンション・オフィス',peers:[
-      {t:'8802',n:'三菱地所',desc:'丸の内・大手町オフィスビル。商業施設・海外不動産も。',scale:'超大型　売上¥1T以上'},
-      {t:'8801',n:'三井不動産',desc:'商業施設・オフィス・ホテル。住宅・海外事業も拡大。',scale:'超大型　売上¥2T以上'},
-      {t:'8830',n:'住友不動産',desc:'オフィスビル・マンション・リフォーム。賃貸比率高い。',scale:'超大型　売上¥1T以上'},
-      {t:'3231',n:'野村不動産HD',desc:'分譲マンション・オフィス・資産運用。野村グループ。',scale:'大型　売上¥700B以上'},
-      {t:'1925',n:'大和ハウス工業',desc:'戸建・賃貸・物流施設・商業施設。総合不動産最大手。',scale:'超大型　売上¥4T以上'},
-      {t:'1928',n:'積水ハウス',desc:'戸建・賃貸・都市再開発・米国住宅。ESG先進企業。',scale:'超大型　売上¥3T以上'},
-      {t:'3291',n:'飯田グループHD',desc:'建売住宅国内最大手。土地仕入れ〜建設〜販売一貫。',scale:'大型　売上¥600B以上'},
-      {t:'3003',n:'ヒューリック',desc:'都心駅近オフィス・店舗特化。高い物件クオリティ。',scale:'大型　売上¥200B以上'},
-      {t:'8905',n:'イオンモール',desc:'イオン系商業施設運営。郊外型SCの最大手。',scale:'大型　売上¥300B以上'},
-      {t:'8860',n:'フジ住宅',desc:'関西圏の分譲マンション・注文住宅・リノベ。',scale:'中型　売上¥100B以上'},
-    ]},
-    re_proptech:{label:'不動産テック / PropTech・仲介DX',peers:[
-      {t:'4256',n:'サインド',desc:'不動産仲介業向けDX SaaS。内見・契約デジタル化特化。',scale:'小型　売上¥2B程度'},
-      {t:'4165',n:'プレイド',desc:'不動産ポータルのCX改善・CVR向上AI SaaS。',scale:'中型　売上¥13B程度'},
-      {t:'3996',n:'サーバーワークス',desc:'不動産会社向けAWSクラウドインフラ・MSP。',scale:'小型　売上¥10B程度'},
-      {t:'4478',n:'freee',desc:'不動産仲介・管理会社向けクラウド会計・給与。',scale:'中型　売上¥30B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'不動産ポータル向けAIチャットボット・チャット対応。',scale:'小型　売上¥2B程度'},
-      {t:'4407',n:'Appier Group',desc:'不動産広告の最適化AI。来場者予測・顧客ターゲティング。',scale:'中型　売上¥15B程度'},
-      {t:'4443',n:'Sansan',desc:'不動産会社の名刺・顧客管理・契約DXSaaS。',scale:'中型　売上¥28B程度'},
-      {t:'4448',n:'Chatwork',desc:'仲介・管理会社の社内外コミュニケーション基盤。',scale:'小型　売上¥8B程度'},
-      {t:'4431',n:'スマレジ',desc:'ショールーム・来客管理SaaS。住宅展示場にも活用。',scale:'中型　売上¥11B程度'},
-      {t:'4776',n:'サイボウズ',desc:'kintoneで物件管理・入居者対応・社内情報共有を構築。',scale:'中型　売上¥24B程度'},
-    ]},
-  }},
-  media_content:{label:'メディア・コンテンツ・ゲーム',subs:{
-    media_game:{label:'ゲーム / スマホゲーム・コンソール',peers:[
-      {t:'7974',n:'任天堂',desc:'Switch・ポケモン・マリオ。世界ゲーム市場のプレミアムIP保有。',scale:'超大型　売上¥1.7T以上'},
-      {t:'9766',n:'コナミグループ',desc:'eFootball・遊戯王・MGS。スポーツジムも展開。',scale:'大型　売上¥400B以上'},
-      {t:'9697',n:'カプコン',desc:'バイオハザード・モンスターハンター。コンソールIP強み。',scale:'大型　売上¥200B以上'},
-      {t:'7832',n:'バンダイナムコHD',desc:'ガンダム・ドラゴンボール・テイルズ。アニメIPとゲームの融合。',scale:'超大型　売上¥1T以上'},
-      {t:'9684',n:'スクウェア・エニックスHD',desc:'FF・ドラクエ・NieR。RPG IP最大手。',scale:'大型　売上¥400B以上'},
-      {t:'3765',n:'ガンホー',desc:'パズル＆ドラゴンズ。モバイルゲーム中堅。',scale:'中型　売上¥50B程度'},
-      {t:'3668',n:'コロプラ',desc:'白猫プロジェクト・スマホゲーム特化。XR事業も展開。',scale:'中型　売上¥20B程度'},
-      {t:'3656',n:'KLab',desc:'ラブライブ！・たたかえ応援団等スマホゲーム。アニメIPコラボ強み。',scale:'小型　売上¥10B程度'},
-      {t:'3662',n:'エイチーム',desc:'スマホゲーム・Webサービス・人材転職サービスを展開。',scale:'小型　売上¥15B程度'},
-      {t:'3808',n:'オウケイウェイヴ',desc:'Q&Aプラットフォーム・ゲーム。NFT・Web3事業も。',scale:'小型　売上¥5B程度'},
-    ]},
-    media_adtech:{label:'メディア / 広告テック・デジタルマーケ',peers:[
-      {t:'4407',n:'Appier Group',desc:'AIマーケティング最適化。EC・金融・ゲーム広告に強み。',scale:'中型　売上¥15B程度'},
-      {t:'2491',n:'バリューコマース',desc:'アフィリエイト広告・成果報酬型EC支援最大手。',scale:'中型　売上¥25B程度'},
-      {t:'3998',n:'ソウルドアウト',desc:'中小企業向けデジタル広告運用・EC支援。',scale:'小型　売上¥30B程度'},
-      {t:'3960',n:'ユーザーローカル',desc:'SNS分析・自然言語AI・チャットボット。BtoBデータ解析。',scale:'小型　売上¥2B程度'},
-      {t:'4165',n:'プレイド',desc:'CX改善AI「KARTE」。広告後のLPO・接客最適化に特化。',scale:'中型　売上¥13B程度'},
-      {t:'6175',n:'ネットマーケティング',desc:'マッチングアプリ「Omiai」・デジタルマーケ支援。',scale:'小型　売上¥7B程度'},
-      {t:'2371',n:'カカクコム',desc:'価格比較・食べログ・映画情報。コンテンツ×広告モデル。',scale:'大型　売上¥60B程度'},
-      {t:'4418',n:'JDSC',desc:'AI需要予測・マーケティングROI最適化SaaS。',scale:'小型　売上¥2B程度'},
-      {t:'4185',n:'ウォンテッドリー',desc:'採用コンテンツマーケティング・エンゲージメント向上SaaS。',scale:'小型　売上¥3B程度'},
-      {t:'4448',n:'Chatwork',desc:'SMB向けチャットSaaS。広告掲載・スタンプ販売も。',scale:'小型　売上¥8B程度'},
-    ]},
-  }},
-  pharma_biotech:{label:'医薬品・バイオテック',subs:{
-    biotech_startup:{label:'バイオテック / 創薬・再生医療',peers:[
-      {t:'4565',n:'そーせいグループ',desc:'GPCRアゴニスト創薬・導出モデル。グローバル共同研究。',scale:'小型　時価総額¥100B程度'},
-      {t:'4563',n:'アンジェス',desc:'遺伝子治療・DNAワクチン。国産Covid-19ワクチン開発。',scale:'小型　売上¥1B未満'},
-      {t:'4588',n:'オンコリスバイオファーマ',desc:'ウイルス製剤を用いたがん治療薬開発バイオ。',scale:'小型　売上¥1B未満'},
-      {t:'4593',n:'ヘリオス',desc:'再生医療・iPS細胞由来製品開発。眼科・肝臓領域。',scale:'小型　売上¥1B未満'},
-      {t:'4592',n:'サンバイオ',desc:'幹細胞創薬。外傷性脳損傷治療薬開発中。',scale:'小型　時価総額¥30B程度'},
-      {t:'4597',n:'ソレイジア・ファーマ',desc:'オンコロジー（がん）製品を導入・販売。ライセンスモデル。',scale:'小型　売上¥1B未満'},
-      {t:'4583',n:'カイオム・バイオサイエンス',desc:'完全ヒト型抗体技術「DeltaBody」。創薬支援・導出。',scale:'小型　売上¥1B未満'},
-      {t:'4574',n:'大幸薬品',desc:'クレベリン（二酸化塩素除菌）・正露丸。OTC薬最大手の一角。',scale:'小型　売上¥5B程度'},
-      {t:'4580',n:'田辺三菱製薬',desc:'ミツビシタナベファーマ。中枢神経・泌尿器・免疫疾患薬。',scale:'大型　売上¥200B以上'},
-      {t:'4594',n:'ブライトパス・バイオ',desc:'がん免疫療法（TCRエディション）の創薬バイオ。',scale:'小型　売上¥1B未満'},
-    ]},
-  }},
-  food_restaurant:{label:'食品・外食',subs:{
-    food_maker:{label:'食品 / 加工食品メーカー',peers:[
-      {t:'2802',n:'味の素',desc:'旨味調味料・冷凍食品・バイオ事業。グローバル展開。',scale:'超大型　売上¥1.5T以上'},
-      {t:'2269',n:'明治HD',desc:'明治・明治安田。菓子・乳製品・医薬品素材。',scale:'超大型　売上¥1.4T以上'},
-      {t:'2801',n:'キッコーマン',desc:'醤油・食品調味料で世界最大手。海外売上比率7割超。',scale:'大型　売上¥500B以上'},
-      {t:'2282',n:'日本ハム',desc:'ハム・ソーセージ・加工食品・北海道ファイターズオーナー。',scale:'大型　売上¥600B以上'},
-      {t:'2871',n:'ニチレイ',desc:'冷凍食品国内最大手。物流冷凍倉庫事業も展開。',scale:'大型　売上¥300B以上'},
-      {t:'2229',n:'カルビー',desc:'ポテトチップス・Frugra。スナック菓子でプレミアム路線。',scale:'大型　売上¥300B以上'},
-      {t:'2002',n:'日清製粉グループ',desc:'製粉・パスタ・冷凍食品・ペットフード。',scale:'大型　売上¥700B以上'},
-      {t:'2264',n:'森永乳業',desc:'牛乳・ヨーグルト・アイス。健康素材事業も拡大。',scale:'大型　売上¥700B以上'},
-      {t:'2212',n:'山崎製パン',desc:'食パン・惣菜パン国内最大手。コンビニ向け強い。',scale:'超大型　売上¥1.1T以上'},
-      {t:'2871',n:'ニチレイ',desc:'冷凍食品・物流冷蔵倉庫。',scale:'大型　売上¥300B以上'},
-    ]},
-    restaurant_chain:{label:'外食 / レストランチェーン',peers:[
-      {t:'7550',n:'ゼンショーHD',desc:'すき家・はま寿司・なか卯。外食売上国内最大手。',scale:'超大型　売上¥700B以上'},
-      {t:'2702',n:'マクドナルドHD',desc:'国内最大のハンバーガーチェーン。デジタル注文推進。',scale:'大型　売上¥400B以上'},
-      {t:'7581',n:'サイゼリヤ',desc:'低価格イタリアンチェーン。海外（中国・豪州）展開も。',scale:'大型　売上¥200B以上'},
-      {t:'3397',n:'トリドールHD',desc:'丸亀製麺・国内外の多ブランド展開。海外強化中。',scale:'大型　売上¥200B以上'},
-      {t:'7616',n:'コメダHD',desc:'コメダ珈琲フランチャイズ。軽食・珈琲の郊外型カフェ。',scale:'中型　売上¥40B程度'},
-      {t:'3097',n:'物語コーポレーション',desc:'焼肉・うどん・ラーメン多ブランド。東海地区発祥。',scale:'中型　売上¥50B程度'},
-      {t:'3395',n:'サンマルクHD',desc:'サンマルクカフェ・バケット。カフェ・洋食チェーン。',scale:'中型　売上¥40B程度'},
-      {t:'9861',n:'吉野家HD',desc:'牛丼チェーン老舗。はなまるうどん・定食メニュー強化。',scale:'大型　売上¥200B以上'},
-      {t:'2695',n:'くら寿司',desc:'回転寿司チェーン。テクノロジー活用・米国進出。',scale:'中型　売上¥100B以上'},
-      {t:'3053',n:'ペッパーフードサービス',desc:'ペッパーランチ・いきなりステーキ（縮小）。',scale:'小型　売上¥10B程度'},
-    ]},
-  }},
-  finance_bank:{label:'金融・銀行・証券・保険',subs:{
-    bank_mega:{label:'銀行 / メガバンク・地銀',peers:[
-      {t:'8306',n:'三菱UFJフィナンシャルG',desc:'国内最大のメガバンク。グローバル展開・AIバンキング。',scale:'超大型　業界最大'},
-      {t:'8316',n:'三井住友フィナンシャルG',desc:'SMFGグループ。カード・リース・証券を含む総合金融。',scale:'超大型　業界大手'},
-      {t:'8411',n:'みずほフィナンシャルG',desc:'みずほ銀行・証券・信託。システム刷新完了で安定成長。',scale:'超大型　業界大手'},
-      {t:'8354',n:'ふくおかフィナンシャルG',desc:'九州最大の地銀グループ。デジタル地銀「みんなの銀行」。',scale:'大型　地銀大手'},
-      {t:'8331',n:'千葉銀行',desc:'千葉県地銀最大手。首都圏での広域展開。',scale:'大型　地銀大手'},
-      {t:'8308',n:'りそなHD',desc:'りそな銀行・埼玉りそな・関西みらい。リテール特化。',scale:'超大型　業界大手'},
-      {t:'8309',n:'三井住友トラストHD',desc:'信託銀行最大手。資産運用・承継・受託業務。',scale:'超大型　業界大手'},
-      {t:'8377',n:'ほくほくFG',desc:'北陸銀行・北海道銀行持株。北日本地銀連合。',scale:'大型　地銀'},
-      {t:'8355',n:'静岡銀行',desc:'静岡県最大地銀。健全経営・デジタル化推進。',scale:'大型　地銀'},
-      {t:'8338',n:'常陽銀行',desc:'茨城地銀最大手。めぶきFGとして筑波銀行と連合。',scale:'大型　地銀'},
-    ]},
-    securities:{label:'証券・投資銀行',peers:[
-      {t:'8604',n:'野村HD',desc:'国内最大証券・投資銀行。M&A・IPO・資産運用。',scale:'超大型　業界首位'},
-      {t:'8601',n:'大和証券グループ',desc:'国内2位証券。リテール・ホールセール・資産運用。',scale:'超大型　業界大手'},
-      {t:'8698',n:'マネックスグループ',desc:'ネット証券・仮想通貨・米国株投資のFintechグループ。',scale:'中型　売上¥80B程度'},
-      {t:'8697',n:'日本取引所グループ',desc:'東証・大阪取引所を運営。独占的取引インフラ。',scale:'大型　業界独占'},
-      {t:'8739',n:'スパークス・グループ',desc:'独立系アクティビスト運用。VC・PE・不動産も展開。',scale:'中型　時価総額¥50B程度'},
-      {t:'8771',n:'イー・ギャランティ',desc:'売掛金保証・信用リスク移転。BtoB与信サービス。',scale:'中型　売上¥10B程度'},
-      {t:'7148',n:'FPG',desc:'オペレーティングリース・節税商品。航空機リースで成長。',scale:'中型　売上¥15B程度'},
-      {t:'8793',n:'NECキャピタルソリューション',desc:'NEC系リース・ファイナンス。IT機器中心の法人向け。',scale:'中型　売上¥100B以上'},
-      {t:'3994',n:'マネーフォワード',desc:'FinTech×証券口座連携・資産管理SaaS。',scale:'中型　売上¥50B程度'},
-      {t:'3769',n:'GMOペイメントゲートウェイ',desc:'BtoB決済・後払い・資金調達支援。決済インフラ最大手。',scale:'大型　売上¥100B以上'},
-    ]},
-    insurance:{label:'保険 / 損保・生保',peers:[
-      {t:'8766',n:'東京海上HD',desc:'損保国内最大手。海外展開・自然災害対応力に定評。',scale:'超大型　業界首位'},
-      {t:'8725',n:'MS&ADインシュアランスG',desc:'三井住友海上・あいおいニッセイ。損保大手。',scale:'超大型　業界大手'},
-      {t:'8630',n:'SOMPOホールディングス',desc:'損保ジャパン・ひまわり生命。介護DXにも注力。',scale:'超大型　業界大手'},
-      {t:'8750',n:'第一生命HD',desc:'生保国内大手。外貨建て保険・資産運用商品強化。',scale:'超大型　業界大手'},
-      {t:'8795',n:'T&Dホールディングス',desc:'太陽生命・大同生命持株。中堅法人向け生保。',scale:'大型　業界中堅'},
-      {t:'8729',n:'ソニーフィナンシャルG',desc:'ソニー系。生保・損保・銀行の複合金融グループ。',scale:'大型　業界中堅'},
-      {t:'8771',n:'イー・ギャランティ',desc:'売掛金保証。信用保険の代替商品として法人需要。',scale:'中型　売上¥10B程度'},
-      {t:'7148',n:'FPG',desc:'航空機リース・節税商品。保険会社の資産運用先でもある。',scale:'中型　売上¥15B程度'},
-      {t:'8739',n:'スパークス・グループ',desc:'独立系運用。保険会社向け資産運用受託も行う。',scale:'中型　時価総額¥50B程度'},
-      {t:'8698',n:'マネックスグループ',desc:'保険比較・ネット保険販売チャネルとしてのFinTech。',scale:'中型　売上¥80B程度'},
-    ]},
-  }},
-  logistics:{label:'物流・運輸',subs:{
-    logistics_delivery:{label:'物流 / 宅配・倉庫・フルフィルメント',peers:[
-      {t:'9064',n:'ヤマトHD',desc:'宅急便で国内最大手。EC拡大で配送量増加中。',scale:'超大型　売上¥1.8T以上'},
-      {t:'9062',n:'日本通運',desc:'国際輸送・引越・物流インフラ。HDIグループ傘下。',scale:'超大型　売上¥2T以上'},
-      {t:'9143',n:'SGHグループ',desc:'佐川急便・西濃運輸。EC物流・3PLに強み。',scale:'超大型　売上¥1.5T以上'},
-      {t:'9147',n:'NIPPON EXPRESS HD',desc:'国際複合輸送で国内最大。半導体・航空貨物に強い。',scale:'超大型　売上¥2T以上'},
-      {t:'9076',n:'セイノーHD',desc:'西濃グループの持株。路線トラック・チルド物流。',scale:'大型　売上¥500B以上'},
-      {t:'9072',n:'ニッコンHD',desc:'ホンダ系物流専門会社。自動車部品輸送に特化。',scale:'大型　売上¥200B以上'},
-      {t:'9101',n:'日本郵船',desc:'コンテナ船・ドライバルク・タンカー・自動車船。',scale:'超大型　売上¥2T以上'},
-      {t:'9104',n:'商船三井',desc:'コンテナ・バルク・エネルギー輸送。LNG輸送強み。',scale:'超大型　売上¥1.5T以上'},
-      {t:'9107',n:'川崎汽船',desc:'コンテナ・バルク・LNG輸送。',scale:'超大型　売上¥800B以上'},
-      {t:'9366',n:'サンリツ',desc:'精密機器専門物流。半導体・医療機器の特殊輸送。',scale:'中型　売上¥30B程度'},
-    ]},
-  }},
+// ─── Sector → EDINET DB API fetch params ─────────────────
+// industries: TSE 33業種コード（複数可）
+// business_tags: EDINET DBのビジネスタグ（カンマ区切り、OR条件）
+const SECTOR_API_MAP={
+  saas_cloud:         {business_tags:'saas,cloud,software'},
+  it_platform:        {business_tags:'platform,marketplace,matching,sharing'},
+  fintech:            {business_tags:'fintech,payments,crypto,lending,insurtech'},
+  healthcare_dx:      {business_tags:'healthtech,medtech,telemedicine'},
+  retail_ec:          {industries:['小売業'],business_tags:'ec_ecommerce,d2c,omnichannel'},
+  manufacturing_tech: {industries:['電気機器','機械','精密機器','輸送用機器','鉄鋼','非鉄金属','化学','金属製品','ゴム製品','ガラス・土石製品','パルプ・紙','繊維製品']},
+  real_estate:        {industries:['不動産業','建設業']},
+  media_content:      {business_tags:'media,game,content,entertainment,streaming,publishing'},
+  pharma_biotech:     {industries:['医薬品']},
+  food_restaurant:    {industries:['食料品','水産・農林業'],business_tags:'restaurant,food'},
+  finance_bank:       {industries:['銀行業','保険業','証券、商品先物取引業','その他金融業']},
+  logistics:          {industries:['陸運業','海運業','空運業','倉庫・運輸関連業']},
 };
+
+// ─── 業種フィールドを安全に取得 ──────────────────────────
+function ind(c){return c.industry||c.submitter_industry||c.industryName||'';}
+
+// ─── Subsector definitions: frontend filter ──────────────
+const SUBSECTOR_DEF={
+  saas_cloud:[
+    {key:'all',            label:'全体（SaaS / クラウド）',       filter:()=>true},
+    {key:'saas_hr',        label:'SaaS / HR・人事・勤怠',         filter:c=>kw(c,['hr','人事','勤怠','タレント','給与','採用','労務'])},
+    {key:'saas_accounting',label:'SaaS / 会計・経費・ERP',        filter:c=>kw(c,['会計','経費','請求','erp','財務','税務','帳票','仕訳'])},
+    {key:'saas_crm',       label:'SaaS / CRM・SFA・営業支援',     filter:c=>kw(c,['crm','sfa','営業','顧客管理','マーケティング','名刺'])},
+    {key:'saas_security',  label:'SaaS / セキュリティ・認証',     filter:c=>kw(c,['セキュリティ','security','認証','ゼロトラスト','サイバー','WAF'])},
+    {key:'saas_ai',        label:'SaaS / AI・データ分析',         filter:c=>kw(c,['ai','人工知能','データ分析','機械学習','アナリティクス'])},
+    {key:'saas_pos',       label:'SaaS / POS・店舗・在庫管理',    filter:c=>kw(c,['pos','店舗','レジ','在庫','棚卸'])},
+    {key:'saas_infra',     label:'SaaS / クラウドインフラ・基盤', filter:c=>kw(c,['クラウド','インフラ','データセンター','ホスティング','サーバー'])},
+  ],
+  it_platform:[
+    {key:'all',             label:'全体（プラットフォーム）',        filter:()=>true},
+    {key:'platform_market', label:'マッチング・マーケットプレイス', filter:c=>kw(c,['マッチ','マーケット','フリマ','オークション','二次流通'])},
+    {key:'platform_hr',     label:'採用・HRテック',                 filter:c=>kw(c,['採用','人材','求人','転職','フリーランス','副業'])},
+    {key:'platform_ec',     label:'ECプラットフォーム',             filter:c=>kw(c,['ec','eコマース','ショッピング','通販','モール'])},
+    {key:'platform_media',  label:'メディア・広告プラットフォーム', filter:c=>kw(c,['広告','メディア','デジタルマーケ','アドテク'])},
+  ],
+  fintech:[
+    {key:'all',             label:'全体（FinTech）',       filter:()=>true},
+    {key:'fintech_payment', label:'決済・ペイメント',      filter:c=>kw(c,['決済','payment','ペイ','カード','後払い','収納'])},
+    {key:'fintech_lending', label:'融資・ローン・信用保証',filter:c=>kw(c,['融資','ローン','貸付','信用','保証','ファクタリング'])},
+    {key:'fintech_invest',  label:'資産管理・投資・仮想通貨',filter:c=>kw(c,['資産','投資','証券','運用','fx','仮想通貨','暗号資産'])},
+    {key:'fintech_insure',  label:'InsurTech・保険テック',  filter:c=>kw(c,['保険','insur','リスク','少額短期'])},
+  ],
+  healthcare_dx:[
+    {key:'all',          label:'全体（ヘルスケアDX）',       filter:()=>true},
+    {key:'health_ehr',   label:'電子カルテ・医療情報システム',filter:c=>kw(c,['電子カルテ','病院','医療情報','EMR','クリニック'])},
+    {key:'health_tele',  label:'オンライン診療・遠隔医療',   filter:c=>kw(c,['オンライン診療','遠隔','テレメディスン'])},
+    {key:'health_pharm', label:'調剤・薬局DX',               filter:c=>kw(c,['調剤','薬局','服薬指導'])},
+    {key:'health_care',  label:'介護・在宅ケアDX',           filter:c=>kw(c,['介護','ケア','在宅','老人','高齢'])},
+    {key:'health_device',label:'医療機器・ヘルスデバイス',   filter:c=>kw(c,['医療機器','デバイス','診断','ウェアラブル'])},
+  ],
+  retail_ec:[
+    {key:'all',            label:'全体（小売・EC）',          filter:()=>true},
+    {key:'retail_fashion', label:'アパレル・ファッション',    filter:c=>kw(c,['アパレル','ファッション','衣料','服','靴','バッグ'])},
+    {key:'retail_food',    label:'コンビニ・スーパー・食品販売',filter:c=>kw(c,['コンビニ','スーパー','食品','食料','ディスカウント'])},
+    {key:'retail_home',    label:'家電・ホームセンター・家具', filter:c=>kw(c,['家電','ホームセンター','家具','インテリア','DIY'])},
+    {key:'retail_ec_pure', label:'EC・D2C専業',               filter:c=>kw(c,['ec','通販','eコマース','d2c','ダイレクト','カタログ'])},
+    {key:'retail_drug',    label:'ドラッグストア・調剤薬局',  filter:c=>kw(c,['ドラッグ','薬','ウエルシア','マツキヨ','スギ','ツルハ'])},
+    {key:'retail_special', label:'専門店・その他',             filter:c=>ind(c)==='小売業'},
+  ],
+  manufacturing_tech:[
+    {key:'all',            label:'全体（製造業）',           filter:()=>true},
+    {key:'mfg_electronic', label:'電子部品・電気機器・半導体',filter:c=>ind(c)==='電気機器'||kw(c,['半導体','電子部品','センサー'])},
+    {key:'mfg_machinery',  label:'機械・産業用設備・ロボット',filter:c=>ind(c)==='機械'},
+    {key:'mfg_auto',       label:'輸送用機器・自動車部品',   filter:c=>ind(c)==='輸送用機器'},
+    {key:'mfg_precision',  label:'精密機器・光学・計測',     filter:c=>ind(c)==='精密機器'},
+    {key:'mfg_chemical',   label:'化学・素材・樹脂',         filter:c=>['化学','ゴム製品','ガラス・土石製品','パルプ・紙','繊維製品'].includes(ind(c))},
+    {key:'mfg_steel',      label:'鉄鋼・非鉄金属・金属製品', filter:c=>['鉄鋼','非鉄金属','金属製品'].includes(ind(c))},
+  ],
+  real_estate:[
+    {key:'all',           label:'全体（不動産・建設）',          filter:()=>true},
+    {key:'re_developer',  label:'デベロッパー・マンション分譲',  filter:c=>ind(c)==='不動産業'&&kw(c,['デベロッパー','分譲','マンション','住宅'])},
+    {key:'re_reit',       label:'REIT・不動産投資法人',          filter:c=>kw(c,['reit','リート','投資法人','アセット'])},
+    {key:'re_manage',     label:'不動産管理・仲介・賃貸',        filter:c=>ind(c)==='不動産業'&&kw(c,['管理','仲介','賃貸','PM'])},
+    {key:'re_general',    label:'総合建設（ゼネコン）',           filter:c=>ind(c)==='建設業'&&kw(c,['建設','ゼネコン','組','工業'])},
+    {key:'re_sub',        label:'サブコン・設備工事・電気工事',  filter:c=>ind(c)==='建設業'&&kw(c,['設備','電気工事','空調','管工事','内装'])},
+    {key:'re_other',      label:'その他不動産・建設',            filter:c=>['不動産業','建設業'].includes(ind(c))},
+  ],
+  media_content:[
+    {key:'all',           label:'全体（メディア・コンテンツ）', filter:()=>true},
+    {key:'media_game',    label:'ゲーム・モバイルゲーム',       filter:c=>kw(c,['ゲーム','game','エンタテインメント','アミューズ'])},
+    {key:'media_tv',      label:'テレビ・映像・放送・動画',     filter:c=>kw(c,['テレビ','放送','映像','動画','ストリーミング','映画'])},
+    {key:'media_publish', label:'出版・漫画・コミック・書籍',   filter:c=>kw(c,['出版','漫画','コミック','書籍','雑誌','電子書籍'])},
+    {key:'media_ad',      label:'広告・PR・プロモーション',     filter:c=>kw(c,['広告','PR','マーケティング','プロモーション','アドテク'])},
+    {key:'media_music',   label:'音楽・ライブ・エンタメ',       filter:c=>kw(c,['音楽','ライブ','コンサート','芸能','アーティスト'])},
+  ],
+  pharma_biotech:[
+    {key:'all',            label:'全体（医薬品・バイオ）',         filter:()=>true},
+    {key:'pharma_major',   label:'大手製薬・倫理薬',              filter:c=>ind(c)==='医薬品'&&!kw(c,['バイオ','創薬','ジェネリック','後発'])},
+    {key:'pharma_bio',     label:'バイオテック・創薬ベンチャー',  filter:c=>kw(c,['バイオ','バイオテック','創薬','抗体','遺伝子','モダリティ'])},
+    {key:'pharma_generic', label:'ジェネリック・後発医薬品',      filter:c=>kw(c,['ジェネリック','後発','沢井','東和','日医工'])},
+    {key:'pharma_otc',     label:'OTC薬・一般用医薬品',           filter:c=>kw(c,['otc','大衆薬','ドラッグ'])},
+    {key:'pharma_med',     label:'医療機器・診断薬',              filter:c=>kw(c,['診断薬','体外診断','検査','試薬'])},
+  ],
+  food_restaurant:[
+    {key:'all',             label:'全体（食品・外食）',        filter:()=>true},
+    {key:'food_maker',      label:'食品メーカー・加工食品',    filter:c=>ind(c)==='食料品'},
+    {key:'food_restaurant', label:'外食・レストランチェーン',  filter:c=>kw(c,['外食','レストラン','ファミレス','チェーン','飲食','カフェ','牛丼','寿司','ラーメン'])},
+    {key:'food_beverage',   label:'飲料・アルコール・ビール', filter:c=>kw(c,['飲料','ビール','酒','ワイン','清涼飲料','ジュース'])},
+    {key:'food_confect',    label:'菓子・スナック・製菓',     filter:c=>kw(c,['菓子','スナック','チョコ','キャンディ','製菓','グミ'])},
+    {key:'food_agri',       label:'農林水産・水産加工',       filter:c=>ind(c)==='水産・農林業'},
+  ],
+  finance_bank:[
+    {key:'all',           label:'全体（金融）',          filter:()=>true},
+    {key:'bank_mega',     label:'メガバンク・大手銀行',  filter:c=>ind(c)==='銀行業'&&kw(c,['フィナンシャル','三菱','三井住友','みずほ','りそな'])},
+    {key:'bank_regional', label:'地方銀行・第二地銀',   filter:c=>ind(c)==='銀行業'&&!kw(c,['三菱','三井住友','みずほ','りそな'])},
+    {key:'securities',    label:'証券・投資銀行・先物',  filter:c=>ind(c)==='証券、商品先物取引業'},
+    {key:'insurance',     label:'損保・生保・共済',     filter:c=>ind(c)==='保険業'},
+    {key:'other_finance', label:'消費者金融・リース・その他金融',filter:c=>ind(c)==='その他金融業'},
+  ],
+  logistics:[
+    {key:'all',                label:'全体（物流・運輸）',         filter:()=>true},
+    {key:'logistics_land',     label:'陸運・トラック・宅配便',    filter:c=>ind(c)==='陸運業'},
+    {key:'logistics_sea',      label:'海運・コンテナ・バルク船',  filter:c=>ind(c)==='海運業'},
+    {key:'logistics_air',      label:'空運・航空・航空貨物',      filter:c=>ind(c)==='空運業'},
+    {key:'logistics_warehouse',label:'倉庫・フォワーダー・3PL',  filter:c=>ind(c)==='倉庫・運輸関連業'},
+  ],
+};
+  saas_cloud:[
+    {key:'all',            label:'全体（SaaS / クラウド）',       filter:()=>true},
+    {key:'saas_hr',        label:'SaaS / HR・人事・勤怠',         filter:c=>kw(c,['hr','人事','勤怠','タレント','給与','採用','労務'])},
+    {key:'saas_accounting',label:'SaaS / 会計・経費・ERP',        filter:c=>kw(c,['会計','経費','請求','erp','財務','税務','帳票','仕訳'])},
+    {key:'saas_crm',       label:'SaaS / CRM・SFA・営業支援',     filter:c=>kw(c,['crm','sfa','営業','顧客管理','マーケティング','名刺'])},
+    {key:'saas_security',  label:'SaaS / セキュリティ・認証',     filter:c=>kw(c,['セキュリティ','security','認証','ゼロトラスト','サイバー','WAF'])},
+    {key:'saas_ai',        label:'SaaS / AI・データ分析',         filter:c=>kw(c,['ai','人工知能','データ分析','機械学習','アナリティクス'])},
+    {key:'saas_pos',       label:'SaaS / POS・店舗・在庫管理',    filter:c=>kw(c,['pos','店舗','レジ','在庫','棚卸'])},
+    {key:'saas_infra',     label:'SaaS / クラウドインフラ・基盤', filter:c=>kw(c,['クラウド','インフラ','データセンター','ホスティング','サーバー'])},
+  ],
+  it_platform:[
+    {key:'all',             label:'全体（プラットフォーム）',        filter:()=>true},
+    {key:'platform_market', label:'マッチング・マーケットプレイス', filter:c=>kw(c,['マッチ','マーケット','フリマ','オークション','二次流通'])},
+    {key:'platform_hr',     label:'採用・HRテック',                 filter:c=>kw(c,['採用','人材','求人','転職','フリーランス','副業'])},
+    {key:'platform_ec',     label:'ECプラットフォーム',             filter:c=>kw(c,['ec','eコマース','ショッピング','通販','モール'])},
+    {key:'platform_media',  label:'メディア・広告プラットフォーム', filter:c=>kw(c,['広告','メディア','デジタルマーケ','アドテク'])},
+  ],
+  fintech:[
+    {key:'all',             label:'全体（FinTech）',       filter:()=>true},
+    {key:'fintech_payment', label:'決済・ペイメント',      filter:c=>kw(c,['決済','payment','ペイ','カード','後払い','収納'])},
+    {key:'fintech_lending', label:'融資・ローン・信用保証',filter:c=>kw(c,['融資','ローン','貸付','信用','保証','ファクタリング'])},
+    {key:'fintech_invest',  label:'資産管理・投資・仮想通貨',filter:c=>kw(c,['資産','投資','証券','運用','fx','仮想通貨','暗号資産'])},
+    {key:'fintech_insure',  label:'InsurTech・保険テック',  filter:c=>kw(c,['保険','insur','リスク','少額短期'])},
+  ],
+  healthcare_dx:[
+    {key:'all',         label:'全体（ヘルスケアDX）',       filter:()=>true},
+    {key:'health_ehr',  label:'電子カルテ・医療情報システム',filter:c=>kw(c,['電子カルテ','病院','医療情報','EMR','クリニック'])},
+    {key:'health_tele', label:'オンライン診療・遠隔医療',   filter:c=>kw(c,['オンライン診療','遠隔','テレメディスン','オンライン医療'])},
+    {key:'health_pharm',label:'調剤・薬局DX',               filter:c=>kw(c,['調剤','薬局','服薬指導'])},
+    {key:'health_care', label:'介護・在宅ケアDX',           filter:c=>kw(c,['介護','ケア','在宅','老人','高齢'])},
+    {key:'health_device',label:'医療機器・ヘルスデバイス',  filter:c=>kw(c,['医療機器','デバイス','診断','ウェアラブル'])},
+  ],
+  retail_ec:[
+    {key:'all',            label:'全体（小売・EC）',          filter:()=>true},
+    {key:'retail_fashion', label:'アパレル・ファッション',    filter:c=>kw(c,['アパレル','ファッション','衣料','服','靴','バッグ'])},
+    {key:'retail_food',    label:'コンビニ・スーパー・食品販売',filter:c=>kw(c,['コンビニ','スーパー','食品','食料','ディスカウント'])},
+    {key:'retail_home',    label:'家電・ホームセンター・家具', filter:c=>kw(c,['家電','ホームセンター','家具','インテリア','DIY'])},
+    {key:'retail_ec_pure', label:'EC・D2C専業',               filter:c=>kw(c,['ec','通販','eコマース','d2c','ダイレクト','カタログ'])},
+    {key:'retail_drug',    label:'ドラッグストア・調剤薬局',  filter:c=>kw(c,['ドラッグ','薬','ウエルシア','マツキヨ','スギ','ツルハ'])},
+    {key:'retail_special', label:'専門店・その他',             filter:c=>c.industry==='小売業'},
+  ],
+  manufacturing_tech:[
+    {key:'all',            label:'全体（製造業）',           filter:()=>true},
+    {key:'mfg_electronic', label:'電子部品・電気機器・半導体',filter:c=>c.industry==='電気機器'||kw(c,['半導体','電子部品','センサー'])},
+    {key:'mfg_machinery',  label:'機械・産業用設備・ロボット',filter:c=>c.industry==='機械'},
+    {key:'mfg_auto',       label:'輸送用機器・自動車部品',   filter:c=>c.industry==='輸送用機器'},
+    {key:'mfg_precision',  label:'精密機器・光学・計測',     filter:c=>c.industry==='精密機器'},
+    {key:'mfg_chemical',   label:'化学・素材・樹脂',         filter:c=>['化学','ゴム製品','ガラス・土石製品','パルプ・紙','繊維製品'].includes(c.industry)},
+    {key:'mfg_steel',      label:'鉄鋼・非鉄金属・金属製品', filter:c=>['鉄鋼','非鉄金属','金属製品'].includes(c.industry)},
+  ],
+  real_estate:[
+    {key:'all',           label:'全体（不動産・建設）',          filter:()=>true},
+    {key:'re_developer',  label:'デベロッパー・マンション分譲',  filter:c=>c.industry==='不動産業'&&kw(c,['デベロッパー','分譲','マンション','住宅'])},
+    {key:'re_reit',       label:'REIT・不動産投資法人',          filter:c=>kw(c,['reit','リート','投資法人','アセット'])},
+    {key:'re_manage',     label:'不動産管理・仲介・賃貸',        filter:c=>c.industry==='不動産業'&&kw(c,['管理','仲介','賃貸','PM'])},
+    {key:'re_general',    label:'総合建設（ゼネコン）',           filter:c=>c.industry==='建設業'&&kw(c,['建設','ゼネコン','組','工業'])},
+    {key:'re_sub',        label:'サブコン・設備工事・電気工事',  filter:c=>c.industry==='建設業'&&kw(c,['設備','電気工事','空調','管工事','内装'])},
+    {key:'re_other',      label:'その他不動産・建設',            filter:c=>['不動産業','建設業'].includes(c.industry)},
+  ],
+  media_content:[
+    {key:'all',           label:'全体（メディア・コンテンツ）', filter:()=>true},
+    {key:'media_game',    label:'ゲーム・モバイルゲーム',       filter:c=>kw(c,['ゲーム','game','エンタテインメント','アミューズ'])},
+    {key:'media_tv',      label:'テレビ・映像・放送・動画',     filter:c=>kw(c,['テレビ','放送','映像','動画','ストリーミング','映画'])},
+    {key:'media_publish', label:'出版・漫画・コミック・書籍',   filter:c=>kw(c,['出版','漫画','コミック','書籍','雑誌','電子書籍'])},
+    {key:'media_ad',      label:'広告・PR・プロモーション',     filter:c=>kw(c,['広告','PR','マーケティング','プロモーション','アドテク'])},
+    {key:'media_music',   label:'音楽・ライブ・エンタメ',       filter:c=>kw(c,['音楽','ライブ','コンサート','芸能','アーティスト'])},
+  ],
+  pharma_biotech:[
+    {key:'all',            label:'全体（医薬品・バイオ）',         filter:()=>true},
+    {key:'pharma_major',   label:'大手製薬・倫理薬',              filter:c=>c.industry==='医薬品'&&!kw(c,['バイオ','創薬','ジェネリック','後発'])},
+    {key:'pharma_bio',     label:'バイオテック・創薬ベンチャー',  filter:c=>kw(c,['バイオ','バイオテック','創薬','抗体','遺伝子','モダリティ'])},
+    {key:'pharma_generic', label:'ジェネリック・後発医薬品',      filter:c=>kw(c,['ジェネリック','後発','沢井','東和','日医工'])},
+    {key:'pharma_otc',     label:'OTC薬・一般用医薬品',           filter:c=>kw(c,['otc','大衆薬','ドラッグ','正露丸','EVEなど'])},
+    {key:'pharma_med',     label:'医療機器・診断薬',              filter:c=>kw(c,['診断薬','体外診断','検査','試薬'])},
+  ],
+  food_restaurant:[
+    {key:'all',             label:'全体（食品・外食）',        filter:()=>true},
+    {key:'food_maker',      label:'食品メーカー・加工食品',    filter:c=>c.industry==='食料品'},
+    {key:'food_restaurant', label:'外食・レストランチェーン',  filter:c=>kw(c,['外食','レストラン','ファミレス','チェーン','飲食','カフェ','牛丼','寿司','ラーメン'])},
+    {key:'food_beverage',   label:'飲料・アルコール・ビール', filter:c=>kw(c,['飲料','ビール','酒','ワイン','清涼飲料','ジュース'])},
+    {key:'food_confect',    label:'菓子・スナック・製菓',     filter:c=>kw(c,['菓子','スナック','チョコ','キャンディ','製菓','グミ'])},
+    {key:'food_agri',       label:'農林水産・水産加工',       filter:c=>c.industry==='水産・農林業'},
+  ],
+  finance_bank:[
+    {key:'all',           label:'全体（金融）',          filter:()=>true},
+    {key:'bank_mega',     label:'メガバンク・大手銀行',  filter:c=>c.industry==='銀行業'&&kw(c,['フィナンシャル','三菱','三井住友','みずほ','りそな','三井トラスト'])},
+    {key:'bank_regional', label:'地方銀行・第二地銀',   filter:c=>c.industry==='銀行業'&&!kw(c,['三菱','三井住友','みずほ','りそな'])},
+    {key:'securities',    label:'証券・投資銀行・先物',  filter:c=>c.industry==='証券、商品先物取引業'},
+    {key:'insurance',     label:'損保・生保・共済',     filter:c=>c.industry==='保険業'},
+    {key:'other_finance', label:'消費者金融・リース・その他金融',filter:c=>c.industry==='その他金融業'},
+  ],
+  logistics:[
+    {key:'all',                label:'全体（物流・運輸）',         filter:()=>true},
+    {key:'logistics_land',     label:'陸運・トラック・宅配便',    filter:c=>c.industry==='陸運業'},
+    {key:'logistics_sea',      label:'海運・コンテナ・バルク船',  filter:c=>c.industry==='海運業'},
+    {key:'logistics_air',      label:'空運・航空・航空貨物',      filter:c=>c.industry==='空運業'},
+    {key:'logistics_warehouse',label:'倉庫・フォワーダー・3PL',  filter:c=>c.industry==='倉庫・運輸関連業'},
+  ],
+};
+
+// ─── Keyword match helper ─────────────────────────────────
+function kw(c,keys){
+  // フィールド名ゆれを吸収: name_ja / filerName / name / name_en
+  const name=c.name_ja||c.filerName||c.name||c.name_en||'';
+  // industry / submitter_industry / industryName
+  const ind=c.industry||c.submitter_industry||c.industryName||'';
+  const t=(name+' '+ind).toLowerCase();
+  return keys.some(k=>t.includes(k.toLowerCase()));
+}
+
+// ─── Sector company cache (session-level) ─────────────────
+const sectorCache={};
+
+// ─── API応答を配列として安全に取り出す ────────────────────
+function extractList(d){
+  // {data:[...]}, {results:[...]}, {companies:[...]}, 直接配列 のいずれかに対応
+  if(Array.isArray(d)) return d;
+  if(Array.isArray(d?.data)) return d.data;
+  if(Array.isArray(d?.results)) return d.results;
+  if(Array.isArray(d?.companies)) return d.companies;
+  // データが見つからない場合はデバッグ出力
+  console.warn('[Valio] extractList: unexpected shape', JSON.stringify(d).slice(0,200));
+  return [];
+}
+
+async function loadSectorCompanies(sk){
+  if(sectorCache[sk]) return sectorCache[sk];
+  const def=SECTOR_API_MAP[sk];
+  if(!def) return [];
+  const companies=[],seen=new Set();
+  const add=arr=>arr.forEach(c=>{
+    const id=c.edinet_code||c.edinetCode||c.edinet_cd;
+    if(id&&!seen.has(id)){seen.add(id);companies.push({...c,edinet_code:id});}
+  });
+
+  // ① 業種コードで取得（/v1/companies）
+  for(const ind of (def.industries||[])){
+    try{
+      // パラメータ名を industry / submitter_industry の両方で試す
+      let d=await apiGet('/companies?industry='+encodeURIComponent(ind)+'&per_page=5000');
+      let list=extractList(d);
+      if(!list.length){
+        d=await apiGet('/companies?submitter_industry='+encodeURIComponent(ind)+'&per_page=5000');
+        list=extractList(d);
+      }
+      console.log('[Valio] industry='+ind+' → '+list.length+'社');
+      add(list);
+    }catch(e){console.warn('[Valio] industry fetch failed:',ind,e.message);}
+  }
+
+  // ② ビジネスタグで取得（/v1/search または /v1/companies）
+  if(def.business_tags){
+    try{
+      // まず /v1/search に business_tags を試す
+      let d=await apiGet('/search?business_tags='+encodeURIComponent(def.business_tags)+'&per_page=5000');
+      let list=extractList(d);
+      // だめなら /v1/companies に tags パラメータで試す
+      if(!list.length){
+        d=await apiGet('/companies?business_tags='+encodeURIComponent(def.business_tags)+'&per_page=5000');
+        list=extractList(d);
+      }
+      console.log('[Valio] business_tags='+def.business_tags+' → '+list.length+'社');
+      add(list);
+    }catch(e){console.warn('[Valio] tags fetch failed:',def.business_tags,e.message);}
+  }
+
+  console.log('[Valio] sector='+sk+' total='+companies.length+'社');
+  companies.sort((a,b)=>(a.name_ja||a.name||'').localeCompare(b.name_ja||b.name||'','ja'));
+  sectorCache[sk]=companies;
+  return companies;
+}
+
+// PEER_DB removed - using API-driven SECTOR_API_MAP
 
 // ─── State ───────────────────────────────────────────────
 let mode='listed',tgt=null,peers=[],selCodes=new Set();
@@ -1062,50 +994,65 @@ function calcFin(f){
 }
 
 // ─── Sector/subsector ────────────────────────────────────
-function onSectorChange(){
+async function onSectorChange(){
   const s=document.getElementById('sector').value;
   const sub=document.getElementById('subsector');
-  sub.innerHTML='<option value="">— 細分類を選択 —</option>';
-  sub.disabled=!s;
-  document.getElementById('peerArea').innerHTML='<div class="info-note">細分類を選択するとピア候補が表示されます。</div>';
+  const peerArea=document.getElementById('peerArea');
+  sub.innerHTML='<option value="">— 読み込み中... —</option>';
+  sub.disabled=true;
   peers=[];selCodes.clear();
-  if(!s||!PEER_DB[s])return;
-  Object.entries(PEER_DB[s].subs).forEach(([k,sv])=>{
-    const o=document.createElement('option');o.value=k;o.textContent=sv.label;sub.appendChild(o);
+  if(!s){
+    sub.innerHTML='<option value="">— 大分類を先に選択 —</option>';
+    peerArea.innerHTML='<div class="info-note">上記で業種を選択するとピア候補が表示されます。</div>';
+    return;
+  }
+  peerArea.innerHTML='<div class="info-note"><span class="spin"></span>企業データをEDINET DBから取得中...</div>';
+  const companies=await loadSectorCompanies(s);
+  // サブセクタープルダウン生成
+  sub.innerHTML='<option value="">— 細分類を選択（全体を見るには「全体」を選択）—</option>';
+  (SUBSECTOR_DEF[s]||[]).forEach(ss=>{
+    const cnt=companies.filter(ss.filter).length;
+    const o=document.createElement('option');
+    o.value=ss.key;
+    o.textContent=ss.label+'（'+cnt+'社）';
+    sub.appendChild(o);
   });
+  sub.disabled=false;
+  peerArea.innerHTML='<div class="info-note">細分類を選択してください。　<strong>'+companies.length+'社</strong>のデータを取得済み。</div>';
 }
 function renderPeers(){
   const sk=document.getElementById('sector').value;
   const subk=document.getElementById('subsector').value;
   if(!sk||!subk)return;
-  const sub=PEER_DB[sk].subs[subk];
   peers=[];selCodes.clear();
+  const companies=sectorCache[sk]||[];
+  const ssDef=(SUBSECTOR_DEF[sk]||[]).find(s=>s.key===subk);
   const tgtCode=tgt?tgt.code:'';
-  const list=sub.peers.filter(p=>p.t!==tgtCode);
+  const list=(ssDef?companies.filter(ssDef.filter):companies)
+    .filter(c=>{const t=(c.sec_code||'').replace(/0$/,'');return t!==tgtCode;});
+  if(!list.length){
+    document.getElementById('peerArea').innerHTML='<div class="info-note">この条件に該当する企業が見つかりませんでした。他の細分類を選択するか、下の検索をご利用ください。</div>';
+    return;
+  }
   document.getElementById('peerArea').innerHTML=`
     <div style="font-size:12px;color:var(--text2);margin-bottom:8px">
-      企業をクリックして選択（複数可）　<span style="color:var(--text3);font-size:11px">─ ${sub.label}</span>
+      企業をクリックして選択（複数可）　<span style="color:var(--text3);font-size:11px">─ ${ssDef?.label||''} / ${list.length}社</span>
     </div>
     <div class="peer-grid">
-      ${list.map(p=>`
-        ${p.noEdinet
-          ? `<div class="peer-chip unavailable" id="chip-${p.t}" title="EDINET DB未収録のため取得不可">
-              <div class="pc-left">
-                <div class="pc-name" style="color:var(--text3)">${p.n}</div>
-                <div class="pc-code">${p.t}</div>
-                <div class="pc-desc" style="color:var(--text3)">EDINET DB 未収録</div>
-              </div>
-              <div style="font-size:9px;color:var(--text3);flex-shrink:0">N/A</div>
-            </div>`
-          : `<div class="peer-chip" id="chip-${p.t}" onclick="togglePeer('${p.t}','${p.n.replace(/'/g,"\\'")}')" >
-              <div class="pc-left">
-                <div class="pc-name">${p.n}</div>
-                <div class="pc-code">${p.t}</div>
-                <div class="pc-desc">${p.desc||''}</div>
-                <div class="pc-scale">${p.scale||''}</div>
-              </div>
-              <div class="pc-check">✓</div>
-            </div>`}`).join('')}
+      ${list.map(c=>{
+        const ticker=((c.sec_code||c.secCode||c.securities_code||'').replace(/0$/,'')).slice(0,4);
+        const name=c.name_ja||c.filerName||c.name||'';
+        const ind=c.industry||c.submitter_industry||'';
+        const nameEsc=name.replace(/'/g,"\\'");
+        return `<div class="peer-chip" id="chip-${ticker}" onclick="togglePeer('${ticker}','${nameEsc}')">
+          <div class="pc-left">
+            <div class="pc-name">${name}</div>
+            <div class="pc-code">${ticker}</div>
+            <div class="pc-desc">${ind}</div>
+          </div>
+          <div class="pc-check">✓</div>
+        </div>`;
+      }).join('')}
     </div>
     <div class="sel-count-bar">選択中：<strong id="selCount">0</strong>社　
       <button id="selectAllBtn" onclick="selectAllPeers()" style="margin-left:10px;padding:3px 10px;font-size:11px;border-radius:4px;border:.5px solid var(--teal-m);background:var(--teal-l);color:var(--teal);cursor:pointer;font-family:var(--sans)">全選択</button>
@@ -1125,7 +1072,7 @@ function renderPeers(){
       <button class="manual-peer-toggle" onclick="toggleManualPeerForm()">＋ 手動でピア追加（EDINET未収録企業・非上場ピア対応）</button>
       <div id="manualPeerForm" style="display:none;margin-top:10px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.6">
-          カオナビ等EDINET DB未収録の上場企業や、非上場企業をピアとして手動追加できます。<br>
+          EDINET DB未収録の上場企業や非上場企業をピアとして手動追加できます。<br>
           IRページの直近通期決算データを入力してください。（百万円単位）
         </div>
         <div class="manual-grid">
@@ -1231,36 +1178,19 @@ async function togglePeer(ticker, name, altName){
 
 // ─── Select all peers ────────────────────────────────────
 async function selectAllPeers(){
-  const btn = document.getElementById('selectAllBtn');
-  if(btn){ btn.disabled = true; btn.textContent = '取得中...'; }
-
-  // 未選択かつ利用可能なチップのみ対象（unavailableは除外）
-  const chips = [...document.querySelectorAll('.peer-chip:not(.selected):not(.unavailable)')];
-  const targets = chips.map(c => ({
-    t: c.id.replace('chip-', ''),
-    n: c.querySelector('.pc-name')?.textContent || '',
-    alt: null
-  })).filter(x => x.t && !selCodes.has(x.t) && !noEdinetCodes.has(x.t));
-
-  // PEER_DBからalt名を取得
-  const sk = document.getElementById('sector').value;
-  const subk = document.getElementById('subsector').value;
-  if(sk && subk && PEER_DB[sk]?.subs[subk]){
-    const dbPeers = PEER_DB[sk].subs[subk].peers;
-    targets.forEach(x => {
-      const dbEntry = dbPeers.find(p => p.t === x.t);
-      if(dbEntry?.alt) x.alt = dbEntry.alt;
-    });
+  const btn=document.getElementById('selectAllBtn');
+  if(btn){btn.disabled=true;btn.textContent='取得中...';}
+  const chips=[...document.querySelectorAll('.peer-chip:not(.selected):not(.unavailable)')];
+  const targets=chips.map(c=>({
+    t:c.id.replace('chip-',''),
+    n:c.querySelector('.pc-name')?.textContent||''
+  })).filter(x=>x.t&&!selCodes.has(x.t)&&!noEdinetCodes.has(x.t));
+  const BATCH=5;
+  for(let i=0;i<targets.length;i+=BATCH){
+    await Promise.allSettled(targets.slice(i,i+BATCH).map(x=>togglePeer(x.t,x.n)));
+    if(i+BATCH<targets.length) await new Promise(r=>setTimeout(r,300));
   }
-
-  // 5件ずつ並行取得
-  const BATCH = 5;
-  for(let i = 0; i < targets.length; i += BATCH){
-    const batch = targets.slice(i, i+BATCH);
-    await Promise.allSettled(batch.map(x => togglePeer(x.t, x.n, x.alt)));
-    if(i+BATCH < targets.length) await new Promise(r => setTimeout(r, 300));
-  }
-  if(btn){ btn.disabled = false; btn.textContent = '全選択'; }
+  if(btn){btn.disabled=false;btn.textContent='全選択';}
 }
 function updateCount(){const el=document.getElementById('selCount');if(el)el.textContent=selCodes.size}
 
