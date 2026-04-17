@@ -214,7 +214,22 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
 .psi-add:hover{filter:brightness(.95)}
 .psi-add.added{border-color:var(--border);background:var(--bg2);color:var(--text3);cursor:default}
 
-/* Powered by EDINET DB */
+/* ピアフィルターバー */
+.peer-filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.peer-filter-input{flex:1;min-width:140px;padding:6px 10px;font-size:12.5px;border:.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:var(--sans)}
+.peer-filter-input:focus{outline:none;border-color:var(--teal-m)}
+.peer-sort-select{padding:6px 10px;font-size:12px;border:.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:var(--sans);cursor:pointer}
+.peer-sort-select:focus{outline:none;border-color:var(--teal-m)}
+.peer-filter-count{font-size:11px;color:var(--text3);white-space:nowrap}
+/* 規模バッジ */
+.pc-scale-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+.sb-xl{background:#E6ECF3;color:#1B3A5C}
+.sb-l {background:#E1F5EE;color:#0F6E56}
+.sb-m {background:#FFF9E6;color:#7B5800}
+.sb-s {background:#F7F7F5;color:#66665f}
+.sb-xs{background:#F7F7F5;color:#99998f}
+/* ターゲット近似マーカー */
+.pc-near{font-size:9px;color:var(--teal);font-weight:600;margin-top:2px}
 .edinet-badge{
   display:inline-flex;align-items:center;gap:6px;
   padding:4px 10px;
@@ -501,20 +516,18 @@ function loadRecent(code){
 const API_KEY='edb_b771a469ac4f384492ccd80177bb10d1';
 const BASE='https://edinetdb.jp/v1';
 
-// ─── Sector → EDINET DB API fetch params ─────────────────
-// industries: TSE 33業種コード（複数可）
-// business_tags: EDINET DBのビジネスタグ（カンマ区切り、OR条件）
+// ─── Sector → TSE業種コードマッピング（全て業種ベース）────
 const SECTOR_API_MAP={
-  saas_cloud:         {business_tags:'saas,cloud,software'},
-  it_platform:        {business_tags:'platform,marketplace,matching,sharing'},
-  fintech:            {business_tags:'fintech,payments,crypto,lending,insurtech'},
-  healthcare_dx:      {business_tags:'healthtech,medtech,telemedicine'},
-  retail_ec:          {industries:['小売業'],business_tags:'ec_ecommerce,d2c,omnichannel'},
+  saas_cloud:         {industries:['情報・通信業']},
+  it_platform:        {industries:['情報・通信業','サービス業']},
+  fintech:            {industries:['情報・通信業','その他金融業','サービス業']},
+  healthcare_dx:      {industries:['情報・通信業','サービス業']},
+  retail_ec:          {industries:['小売業','サービス業']},
   manufacturing_tech: {industries:['電気機器','機械','精密機器','輸送用機器','鉄鋼','非鉄金属','化学','金属製品','ゴム製品','ガラス・土石製品','パルプ・紙','繊維製品']},
   real_estate:        {industries:['不動産業','建設業']},
-  media_content:      {business_tags:'media,game,content,entertainment,streaming,publishing'},
+  media_content:      {industries:['情報・通信業','サービス業']},
   pharma_biotech:     {industries:['医薬品']},
-  food_restaurant:    {industries:['食料品','水産・農林業'],business_tags:'restaurant,food'},
+  food_restaurant:    {industries:['食料品','水産・農林業','サービス業']},
   finance_bank:       {industries:['銀行業','保険業','証券、商品先物取引業','その他金融業']},
   logistics:          {industries:['陸運業','海運業','空運業','倉庫・運輸関連業']},
 };
@@ -623,105 +636,6 @@ const SUBSECTOR_DEF={
     {key:'logistics_warehouse',label:'倉庫・フォワーダー・3PL',  filter:c=>ind(c)==='倉庫・運輸関連業'},
   ],
 };
-  saas_cloud:[
-    {key:'all',            label:'全体（SaaS / クラウド）',       filter:()=>true},
-    {key:'saas_hr',        label:'SaaS / HR・人事・勤怠',         filter:c=>kw(c,['hr','人事','勤怠','タレント','給与','採用','労務'])},
-    {key:'saas_accounting',label:'SaaS / 会計・経費・ERP',        filter:c=>kw(c,['会計','経費','請求','erp','財務','税務','帳票','仕訳'])},
-    {key:'saas_crm',       label:'SaaS / CRM・SFA・営業支援',     filter:c=>kw(c,['crm','sfa','営業','顧客管理','マーケティング','名刺'])},
-    {key:'saas_security',  label:'SaaS / セキュリティ・認証',     filter:c=>kw(c,['セキュリティ','security','認証','ゼロトラスト','サイバー','WAF'])},
-    {key:'saas_ai',        label:'SaaS / AI・データ分析',         filter:c=>kw(c,['ai','人工知能','データ分析','機械学習','アナリティクス'])},
-    {key:'saas_pos',       label:'SaaS / POS・店舗・在庫管理',    filter:c=>kw(c,['pos','店舗','レジ','在庫','棚卸'])},
-    {key:'saas_infra',     label:'SaaS / クラウドインフラ・基盤', filter:c=>kw(c,['クラウド','インフラ','データセンター','ホスティング','サーバー'])},
-  ],
-  it_platform:[
-    {key:'all',             label:'全体（プラットフォーム）',        filter:()=>true},
-    {key:'platform_market', label:'マッチング・マーケットプレイス', filter:c=>kw(c,['マッチ','マーケット','フリマ','オークション','二次流通'])},
-    {key:'platform_hr',     label:'採用・HRテック',                 filter:c=>kw(c,['採用','人材','求人','転職','フリーランス','副業'])},
-    {key:'platform_ec',     label:'ECプラットフォーム',             filter:c=>kw(c,['ec','eコマース','ショッピング','通販','モール'])},
-    {key:'platform_media',  label:'メディア・広告プラットフォーム', filter:c=>kw(c,['広告','メディア','デジタルマーケ','アドテク'])},
-  ],
-  fintech:[
-    {key:'all',             label:'全体（FinTech）',       filter:()=>true},
-    {key:'fintech_payment', label:'決済・ペイメント',      filter:c=>kw(c,['決済','payment','ペイ','カード','後払い','収納'])},
-    {key:'fintech_lending', label:'融資・ローン・信用保証',filter:c=>kw(c,['融資','ローン','貸付','信用','保証','ファクタリング'])},
-    {key:'fintech_invest',  label:'資産管理・投資・仮想通貨',filter:c=>kw(c,['資産','投資','証券','運用','fx','仮想通貨','暗号資産'])},
-    {key:'fintech_insure',  label:'InsurTech・保険テック',  filter:c=>kw(c,['保険','insur','リスク','少額短期'])},
-  ],
-  healthcare_dx:[
-    {key:'all',         label:'全体（ヘルスケアDX）',       filter:()=>true},
-    {key:'health_ehr',  label:'電子カルテ・医療情報システム',filter:c=>kw(c,['電子カルテ','病院','医療情報','EMR','クリニック'])},
-    {key:'health_tele', label:'オンライン診療・遠隔医療',   filter:c=>kw(c,['オンライン診療','遠隔','テレメディスン','オンライン医療'])},
-    {key:'health_pharm',label:'調剤・薬局DX',               filter:c=>kw(c,['調剤','薬局','服薬指導'])},
-    {key:'health_care', label:'介護・在宅ケアDX',           filter:c=>kw(c,['介護','ケア','在宅','老人','高齢'])},
-    {key:'health_device',label:'医療機器・ヘルスデバイス',  filter:c=>kw(c,['医療機器','デバイス','診断','ウェアラブル'])},
-  ],
-  retail_ec:[
-    {key:'all',            label:'全体（小売・EC）',          filter:()=>true},
-    {key:'retail_fashion', label:'アパレル・ファッション',    filter:c=>kw(c,['アパレル','ファッション','衣料','服','靴','バッグ'])},
-    {key:'retail_food',    label:'コンビニ・スーパー・食品販売',filter:c=>kw(c,['コンビニ','スーパー','食品','食料','ディスカウント'])},
-    {key:'retail_home',    label:'家電・ホームセンター・家具', filter:c=>kw(c,['家電','ホームセンター','家具','インテリア','DIY'])},
-    {key:'retail_ec_pure', label:'EC・D2C専業',               filter:c=>kw(c,['ec','通販','eコマース','d2c','ダイレクト','カタログ'])},
-    {key:'retail_drug',    label:'ドラッグストア・調剤薬局',  filter:c=>kw(c,['ドラッグ','薬','ウエルシア','マツキヨ','スギ','ツルハ'])},
-    {key:'retail_special', label:'専門店・その他',             filter:c=>c.industry==='小売業'},
-  ],
-  manufacturing_tech:[
-    {key:'all',            label:'全体（製造業）',           filter:()=>true},
-    {key:'mfg_electronic', label:'電子部品・電気機器・半導体',filter:c=>c.industry==='電気機器'||kw(c,['半導体','電子部品','センサー'])},
-    {key:'mfg_machinery',  label:'機械・産業用設備・ロボット',filter:c=>c.industry==='機械'},
-    {key:'mfg_auto',       label:'輸送用機器・自動車部品',   filter:c=>c.industry==='輸送用機器'},
-    {key:'mfg_precision',  label:'精密機器・光学・計測',     filter:c=>c.industry==='精密機器'},
-    {key:'mfg_chemical',   label:'化学・素材・樹脂',         filter:c=>['化学','ゴム製品','ガラス・土石製品','パルプ・紙','繊維製品'].includes(c.industry)},
-    {key:'mfg_steel',      label:'鉄鋼・非鉄金属・金属製品', filter:c=>['鉄鋼','非鉄金属','金属製品'].includes(c.industry)},
-  ],
-  real_estate:[
-    {key:'all',           label:'全体（不動産・建設）',          filter:()=>true},
-    {key:'re_developer',  label:'デベロッパー・マンション分譲',  filter:c=>c.industry==='不動産業'&&kw(c,['デベロッパー','分譲','マンション','住宅'])},
-    {key:'re_reit',       label:'REIT・不動産投資法人',          filter:c=>kw(c,['reit','リート','投資法人','アセット'])},
-    {key:'re_manage',     label:'不動産管理・仲介・賃貸',        filter:c=>c.industry==='不動産業'&&kw(c,['管理','仲介','賃貸','PM'])},
-    {key:'re_general',    label:'総合建設（ゼネコン）',           filter:c=>c.industry==='建設業'&&kw(c,['建設','ゼネコン','組','工業'])},
-    {key:'re_sub',        label:'サブコン・設備工事・電気工事',  filter:c=>c.industry==='建設業'&&kw(c,['設備','電気工事','空調','管工事','内装'])},
-    {key:'re_other',      label:'その他不動産・建設',            filter:c=>['不動産業','建設業'].includes(c.industry)},
-  ],
-  media_content:[
-    {key:'all',           label:'全体（メディア・コンテンツ）', filter:()=>true},
-    {key:'media_game',    label:'ゲーム・モバイルゲーム',       filter:c=>kw(c,['ゲーム','game','エンタテインメント','アミューズ'])},
-    {key:'media_tv',      label:'テレビ・映像・放送・動画',     filter:c=>kw(c,['テレビ','放送','映像','動画','ストリーミング','映画'])},
-    {key:'media_publish', label:'出版・漫画・コミック・書籍',   filter:c=>kw(c,['出版','漫画','コミック','書籍','雑誌','電子書籍'])},
-    {key:'media_ad',      label:'広告・PR・プロモーション',     filter:c=>kw(c,['広告','PR','マーケティング','プロモーション','アドテク'])},
-    {key:'media_music',   label:'音楽・ライブ・エンタメ',       filter:c=>kw(c,['音楽','ライブ','コンサート','芸能','アーティスト'])},
-  ],
-  pharma_biotech:[
-    {key:'all',            label:'全体（医薬品・バイオ）',         filter:()=>true},
-    {key:'pharma_major',   label:'大手製薬・倫理薬',              filter:c=>c.industry==='医薬品'&&!kw(c,['バイオ','創薬','ジェネリック','後発'])},
-    {key:'pharma_bio',     label:'バイオテック・創薬ベンチャー',  filter:c=>kw(c,['バイオ','バイオテック','創薬','抗体','遺伝子','モダリティ'])},
-    {key:'pharma_generic', label:'ジェネリック・後発医薬品',      filter:c=>kw(c,['ジェネリック','後発','沢井','東和','日医工'])},
-    {key:'pharma_otc',     label:'OTC薬・一般用医薬品',           filter:c=>kw(c,['otc','大衆薬','ドラッグ','正露丸','EVEなど'])},
-    {key:'pharma_med',     label:'医療機器・診断薬',              filter:c=>kw(c,['診断薬','体外診断','検査','試薬'])},
-  ],
-  food_restaurant:[
-    {key:'all',             label:'全体（食品・外食）',        filter:()=>true},
-    {key:'food_maker',      label:'食品メーカー・加工食品',    filter:c=>c.industry==='食料品'},
-    {key:'food_restaurant', label:'外食・レストランチェーン',  filter:c=>kw(c,['外食','レストラン','ファミレス','チェーン','飲食','カフェ','牛丼','寿司','ラーメン'])},
-    {key:'food_beverage',   label:'飲料・アルコール・ビール', filter:c=>kw(c,['飲料','ビール','酒','ワイン','清涼飲料','ジュース'])},
-    {key:'food_confect',    label:'菓子・スナック・製菓',     filter:c=>kw(c,['菓子','スナック','チョコ','キャンディ','製菓','グミ'])},
-    {key:'food_agri',       label:'農林水産・水産加工',       filter:c=>c.industry==='水産・農林業'},
-  ],
-  finance_bank:[
-    {key:'all',           label:'全体（金融）',          filter:()=>true},
-    {key:'bank_mega',     label:'メガバンク・大手銀行',  filter:c=>c.industry==='銀行業'&&kw(c,['フィナンシャル','三菱','三井住友','みずほ','りそな','三井トラスト'])},
-    {key:'bank_regional', label:'地方銀行・第二地銀',   filter:c=>c.industry==='銀行業'&&!kw(c,['三菱','三井住友','みずほ','りそな'])},
-    {key:'securities',    label:'証券・投資銀行・先物',  filter:c=>c.industry==='証券、商品先物取引業'},
-    {key:'insurance',     label:'損保・生保・共済',     filter:c=>c.industry==='保険業'},
-    {key:'other_finance', label:'消費者金融・リース・その他金融',filter:c=>c.industry==='その他金融業'},
-  ],
-  logistics:[
-    {key:'all',                label:'全体（物流・運輸）',         filter:()=>true},
-    {key:'logistics_land',     label:'陸運・トラック・宅配便',    filter:c=>c.industry==='陸運業'},
-    {key:'logistics_sea',      label:'海運・コンテナ・バルク船',  filter:c=>c.industry==='海運業'},
-    {key:'logistics_air',      label:'空運・航空・航空貨物',      filter:c=>c.industry==='空運業'},
-    {key:'logistics_warehouse',label:'倉庫・フォワーダー・3PL',  filter:c=>c.industry==='倉庫・運輸関連業'},
-  ],
-};
 
 // ─── Keyword match helper ─────────────────────────────────
 function kw(c,keys){
@@ -738,61 +652,54 @@ const sectorCache={};
 
 // ─── API応答を配列として安全に取り出す ────────────────────
 function extractList(d){
-  // {data:[...]}, {results:[...]}, {companies:[...]}, 直接配列 のいずれかに対応
   if(Array.isArray(d)) return d;
   if(Array.isArray(d?.data)) return d.data;
   if(Array.isArray(d?.results)) return d.results;
   if(Array.isArray(d?.companies)) return d.companies;
-  // データが見つからない場合はデバッグ出力
-  console.warn('[Valio] extractList: unexpected shape', JSON.stringify(d).slice(0,200));
+  console.warn('[Valio] extractList: unexpected shape',JSON.stringify(d).slice(0,200));
   return [];
+}
+
+// ─── 全企業一括取得（セッション内キャッシュ・1回のみ）────
+const _allCompaniesCache={data:null,promise:null};
+
+async function fetchAllCompanies(){
+  if(_allCompaniesCache.data) return _allCompaniesCache.data;
+  if(_allCompaniesCache.promise) return _allCompaniesCache.promise;
+  _allCompaniesCache.promise=(async()=>{
+    try{
+      const d=await apiGet('/companies?per_page=5000');
+      const list=extractList(d);
+      console.log('[Valio] 全企業一括取得: '+list.length+'社');
+      // フィールド名確認（初回のみ）
+      if(list.length>0){
+        const sample=list[0];
+        console.log('[Valio] 企業リストのフィールド一覧:',Object.keys(sample).join(', '));
+        console.log('[Valio] サンプル企業:',JSON.stringify(sample));
+      }
+      _allCompaniesCache.data=list;
+      return list;
+    }catch(e){
+      console.error('[Valio] 全企業取得失敗:',e.message);
+      return [];
+    }finally{
+      _allCompaniesCache.promise=null;
+    }
+  })();
+  return _allCompaniesCache.promise;
 }
 
 async function loadSectorCompanies(sk){
   if(sectorCache[sk]) return sectorCache[sk];
   const def=SECTOR_API_MAP[sk];
-  if(!def) return [];
-  const companies=[],seen=new Set();
-  const add=arr=>arr.forEach(c=>{
-    const id=c.edinet_code||c.edinetCode||c.edinet_cd;
-    if(id&&!seen.has(id)){seen.add(id);companies.push({...c,edinet_code:id});}
-  });
-
-  // ① 業種コードで取得（/v1/companies）
-  for(const ind of (def.industries||[])){
-    try{
-      // パラメータ名を industry / submitter_industry の両方で試す
-      let d=await apiGet('/companies?industry='+encodeURIComponent(ind)+'&per_page=5000');
-      let list=extractList(d);
-      if(!list.length){
-        d=await apiGet('/companies?submitter_industry='+encodeURIComponent(ind)+'&per_page=5000');
-        list=extractList(d);
-      }
-      console.log('[Valio] industry='+ind+' → '+list.length+'社');
-      add(list);
-    }catch(e){console.warn('[Valio] industry fetch failed:',ind,e.message);}
-  }
-
-  // ② ビジネスタグで取得（/v1/search または /v1/companies）
-  if(def.business_tags){
-    try{
-      // まず /v1/search に business_tags を試す
-      let d=await apiGet('/search?business_tags='+encodeURIComponent(def.business_tags)+'&per_page=5000');
-      let list=extractList(d);
-      // だめなら /v1/companies に tags パラメータで試す
-      if(!list.length){
-        d=await apiGet('/companies?business_tags='+encodeURIComponent(def.business_tags)+'&per_page=5000');
-        list=extractList(d);
-      }
-      console.log('[Valio] business_tags='+def.business_tags+' → '+list.length+'社');
-      add(list);
-    }catch(e){console.warn('[Valio] tags fetch failed:',def.business_tags,e.message);}
-  }
-
-  console.log('[Valio] sector='+sk+' total='+companies.length+'社');
-  companies.sort((a,b)=>(a.name_ja||a.name||'').localeCompare(b.name_ja||b.name||'','ja'));
-  sectorCache[sk]=companies;
-  return companies;
+  if(!def?.industries?.length) return [];
+  const all=await fetchAllCompanies();
+  const indSet=new Set(def.industries);
+  const filtered=all.filter(c=>indSet.has(ind(c)));
+  console.log('[Valio] sector='+sk+' total='+filtered.length+'社');
+  filtered.sort((a,b)=>(a.name_ja||a.name||'').localeCompare(b.name_ja||b.name||'','ja'));
+  sectorCache[sk]=filtered;
+  return filtered;
 }
 
 // PEER_DB removed - using API-driven SECTOR_API_MAP
@@ -1020,6 +927,9 @@ async function onSectorChange(){
   sub.disabled=false;
   peerArea.innerHTML='<div class="info-note">細分類を選択してください。　<strong>'+companies.length+'社</strong>のデータを取得済み。</div>';
 }
+// ─── ピア表示用の現在リスト（フィルタ・ソートに使用） ─────
+let _peerDisplayList=[];
+
 function renderPeers(){
   const sk=document.getElementById('sector').value;
   const subk=document.getElementById('subsector').value;
@@ -1028,32 +938,28 @@ function renderPeers(){
   const companies=sectorCache[sk]||[];
   const ssDef=(SUBSECTOR_DEF[sk]||[]).find(s=>s.key===subk);
   const tgtCode=tgt?tgt.code:'';
-  const list=(ssDef?companies.filter(ssDef.filter):companies)
+  _peerDisplayList=(ssDef?companies.filter(ssDef.filter):companies)
     .filter(c=>{const t=(c.sec_code||'').replace(/0$/,'');return t!==tgtCode;});
-  if(!list.length){
+  if(!_peerDisplayList.length){
     document.getElementById('peerArea').innerHTML='<div class="info-note">この条件に該当する企業が見つかりませんでした。他の細分類を選択するか、下の検索をご利用ください。</div>';
     return;
   }
+  // フィルターバーと空グリッドを描画してから中身を注入
   document.getElementById('peerArea').innerHTML=`
     <div style="font-size:12px;color:var(--text2);margin-bottom:8px">
-      企業をクリックして選択（複数可）　<span style="color:var(--text3);font-size:11px">─ ${ssDef?.label||''} / ${list.length}社</span>
+      企業をクリックして選択（複数可）　<span style="color:var(--text3);font-size:11px">─ ${ssDef?.label||''}</span>
     </div>
-    <div class="peer-grid">
-      ${list.map(c=>{
-        const ticker=((c.sec_code||c.secCode||c.securities_code||'').replace(/0$/,'')).slice(0,4);
-        const name=c.name_ja||c.filerName||c.name||'';
-        const ind=c.industry||c.submitter_industry||'';
-        const nameEsc=name.replace(/'/g,"\\'");
-        return `<div class="peer-chip" id="chip-${ticker}" onclick="togglePeer('${ticker}','${nameEsc}')">
-          <div class="pc-left">
-            <div class="pc-name">${name}</div>
-            <div class="pc-code">${ticker}</div>
-            <div class="pc-desc">${ind}</div>
-          </div>
-          <div class="pc-check">✓</div>
-        </div>`;
-      }).join('')}
+    <div class="peer-filter-bar">
+      <input class="peer-filter-input" id="peerFilterQ" type="text"
+        placeholder="社名・コードで絞り込み..." oninput="applyPeerFilter(true)">
+      <select class="peer-sort-select" id="peerSortMode" onchange="applyPeerFilter(true)">
+        <option value="alpha">五十音順</option>
+        <option value="size_desc">財務スコア 高→低</option>
+        <option value="size_asc">財務スコア 低→高</option>
+      </select>
+      <span class="peer-filter-count" id="peerFilterCount"></span>
     </div>
+    <div class="peer-grid" id="peerGrid"></div>
     <div class="sel-count-bar">選択中：<strong id="selCount">0</strong>社　
       <button id="selectAllBtn" onclick="selectAllPeers()" style="margin-left:10px;padding:3px 10px;font-size:11px;border-radius:4px;border:.5px solid var(--teal-m);background:var(--teal-l);color:var(--teal);cursor:pointer;font-family:var(--sans)">全選択</button>
       <button onclick="clearAllPeers()" style="margin-left:5px;padding:3px 10px;font-size:11px;border-radius:4px;border:.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans)">全解除</button>
@@ -1093,6 +999,134 @@ function renderPeers(){
         </div>
       </div>
     </div>`;
+  applyPeerFilter();
+}
+
+// ─── ページネーション状態 ────────────────────────────────
+const PEER_PAGE_SIZE=30;
+let _peerCurrentPage=1;
+let _peerSortedList=[];  // フィルタ・ソート済み全件
+
+// ─── 売上高バッジ（選択後に更新） ────────────────────────
+function fmtRevBadge(revM){
+  if(!revM||revM<=0) return '';
+  let label;
+  if(revM>=1000000)     label='¥'+( revM/1000000).toFixed(1)+'T';
+  else if(revM>=100000) label='¥'+Math.round(revM/1000)+'B';
+  else if(revM>=10000)  label='¥'+(revM/1000).toFixed(1)+'B';
+  else if(revM>=1000)   label='¥'+(revM/1000).toFixed(2)+'B';
+  else                  label='¥'+Math.round(revM)+'M';
+  return `<span class="pc-scale-badge sb-l">${label}</span>`;
+}
+
+function updateChipRevBadge(ticker, revM){
+  const el=document.getElementById('revbadge-'+ticker);
+  if(el&&revM) el.innerHTML=fmtRevBadge(revM);
+}
+
+// scaleBadgeHtml は未選択チップでは使用しない（選択後に updateChipRevBadge で更新）
+function scaleBadgeHtml(){ return ''; }
+function nearTgtHtml(){    return ''; }
+
+// ─── フィルタ＆ソートを適用してページネーション描画 ────────
+function applyPeerFilter(resetPage){
+  if(resetPage) _peerCurrentPage=1;
+  const q=(document.getElementById('peerFilterQ')?.value||'').toLowerCase();
+  const sort=document.getElementById('peerSortMode')?.value||'alpha';
+  let list=[..._peerDisplayList];
+
+  // テキスト絞り込み
+  if(q){
+    list=list.filter(c=>{
+      const name=(c.name_ja||c.name||'').toLowerCase();
+      const ticker=((c.sec_code||'').replace(/0$/,'')).toLowerCase();
+      return name.includes(q)||ticker.includes(q);
+    });
+  }
+
+  // ソート（credit_scoreは常に存在するため確実に動作）
+  if(sort==='size_desc'){
+    list.sort((a,b)=>(b.credit_score??0)-(a.credit_score??0));
+  }else if(sort==='size_asc'){
+    list.sort((a,b)=>(a.credit_score??0)-(b.credit_score??0));
+  }
+  // alpha はデフォルト（五十音ソート済み）
+
+  _peerSortedList=list;
+  renderPeerPage();
+}
+
+function renderPeerPage(){
+  const total=_peerSortedList.length;
+  const totalPages=Math.max(1,Math.ceil(total/PEER_PAGE_SIZE));
+  _peerCurrentPage=Math.min(_peerCurrentPage,totalPages);
+  const start=(_peerCurrentPage-1)*PEER_PAGE_SIZE;
+  const page=_peerSortedList.slice(start,start+PEER_PAGE_SIZE);
+
+  // カウント更新
+  const cnt=document.getElementById('peerFilterCount');
+  if(cnt) cnt.textContent=total+'社中 '+(_peerCurrentPage)+'/'+totalPages+'ページ';
+
+  // グリッド描画
+  const grid=document.getElementById('peerGrid');
+  if(!grid) return;
+  if(!page.length){
+    grid.innerHTML='<div class="info-note" style="grid-column:1/-1">条件に一致する企業が見つかりません。</div>';
+    renderPagerBar(0,totalPages);
+    return;
+  }
+  grid.innerHTML=page.map(c=>{
+    const ticker=((c.sec_code||c.secCode||'').replace(/0$/,'')).slice(0,4);
+    const name=c.name_ja||c.filerName||c.name||'';
+    const industry=ind(c);
+    const nameEsc=name.replace(/'/g,"\\'");
+    const alreadySel=selCodes.has(ticker);
+    return `<div class="peer-chip${alreadySel?' selected':''}" id="chip-${ticker}" onclick="togglePeer('${ticker}','${nameEsc}')">
+      <div class="pc-left">
+        <div class="pc-name">${name}<span id="revbadge-${ticker}"></span></div>
+        <div class="pc-code">${ticker}</div>
+        <div class="pc-desc">${industry}</div>
+      </div>
+      <div class="pc-check">✓</div>
+    </div>`;
+  }).join('');
+  renderPagerBar(totalPages,totalPages);
+}
+
+function renderPagerBar(cur,total){
+  const existing=document.getElementById('peerPager');
+  if(existing) existing.remove();
+  if(total<=1) return;
+  const bar=document.createElement('div');
+  bar.id='peerPager';
+  bar.style.cssText='display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap';
+  const btn=(label,page,disabled)=>{
+    const b=document.createElement('button');
+    b.textContent=label;
+    b.disabled=disabled;
+    b.style.cssText='padding:4px 11px;font-size:12px;border-radius:4px;border:.5px solid var(--border2);background:'+(page===_peerCurrentPage?'var(--teal-l)':'var(--bg)')+';color:'+(page===_peerCurrentPage?'var(--teal)':'var(--text2)')+';cursor:'+(disabled?'default':'pointer')+';font-family:var(--sans)';
+    if(!disabled) b.onclick=()=>{_peerCurrentPage=page;renderPeerPage();};
+    return b;
+  };
+  bar.appendChild(btn('‹',_peerCurrentPage-1,_peerCurrentPage===1));
+  // 最大7ページボタン
+  const pages=[];
+  if(total<=7){for(let i=1;i<=total;i++)pages.push(i);}
+  else{
+    pages.push(1);
+    if(_peerCurrentPage>3) pages.push('…');
+    for(let i=Math.max(2,_peerCurrentPage-1);i<=Math.min(total-1,_peerCurrentPage+1);i++) pages.push(i);
+    if(_peerCurrentPage<total-2) pages.push('…');
+    pages.push(total);
+  }
+  pages.forEach(p=>{
+    if(p==='…'){const s=document.createElement('span');s.textContent='…';s.style.color='var(--text3)';bar.appendChild(s);}
+    else bar.appendChild(btn(p,p,false));
+  });
+  bar.appendChild(btn('›',_peerCurrentPage+1,_peerCurrentPage===total));
+  // グリッドの後に挿入
+  const grid=document.getElementById('peerGrid');
+  if(grid) grid.after(bar);
 }
 
 // ─── Peer toggle ─────────────────────────────────────────
@@ -1160,6 +1194,8 @@ async function togglePeer(ticker, name, altName){
       month:rawF.fiscal_year||'', isPrivate:false, ...c});
     selCodes.add(ticker);
     chip.classList.add('selected');
+    // 売上高バッジを更新（財務取得済みのため追加API不要）
+    updateChipRevBadge(ticker, c.rev);
   }catch(e){
     const codeEl = chip.querySelector('.pc-code');
     chip.style.border = '.5px solid var(--red-t)';
