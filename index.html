@@ -954,8 +954,9 @@ function renderPeers(){
         placeholder="社名・コードで絞り込み..." oninput="applyPeerFilter(true)">
       <select class="peer-sort-select" id="peerSortMode" onchange="applyPeerFilter(true)">
         <option value="alpha">五十音順</option>
-        <option value="size_desc">財務スコア 高→低</option>
-        <option value="size_asc">財務スコア 低→高</option>
+        <option value="score_desc">優良度順（高→低）</option>
+        <option value="rev_desc">売上高 大→小</option>
+        <option value="rev_asc">売上高 小→大</option>
       </select>
       <span class="peer-filter-count" id="peerFilterCount"></span>
     </div>
@@ -1044,11 +1045,13 @@ function applyPeerFilter(resetPage){
     });
   }
 
-  // ソート（credit_scoreは常に存在するため確実に動作）
-  if(sort==='size_desc'){
+  // ソート
+  if(sort==='rev_desc'){
+    list.sort((a,b)=>(b._rev||0)-(a._rev||0));
+  }else if(sort==='rev_asc'){
+    list.sort((a,b)=>(a._rev!=null?a._rev:Infinity)-(b._rev!=null?b._rev:Infinity));
+  }else if(sort==='score_desc'){
     list.sort((a,b)=>(b.credit_score??0)-(a.credit_score??0));
-  }else if(sort==='size_asc'){
-    list.sort((a,b)=>(a.credit_score??0)-(b.credit_score??0));
   }
   // alpha はデフォルト（五十音ソート済み）
 
@@ -1085,16 +1088,84 @@ function renderPeerPage(){
       <div class="pc-left">
         <div class="pc-name">${name}<span id="revbadge-${ticker}"></span></div>
         <div class="pc-code">${ticker}</div>
-        <div class="pc-desc">${industry}</div>
+        <div class="pc-desc" id="desc-${ticker}">${industry}</div>
       </div>
       <div class="pc-check">✓</div>
     </div>`;
   }).join('');
   renderPagerBar(totalPages,totalPages);
+  // バックグラウンドで財務データ取得 → 売上高バッジ＋ソート更新
+  prefetchPageRevenue(page);
+  // Claude APIで事業内容1行を生成
+  generatePeerDescriptions(page);
+}
+
+// ─── バックグラウンド：30社の売上高を取得してバッジ更新 ───
+async function prefetchPageRevenue(pageList){
+  const BATCH=5;
+  for(let i=0;i<pageList.length;i+=BATCH){
+    await Promise.allSettled(pageList.slice(i,i+BATCH).map(c=>fetchCompanyRevenue(c)));
+    if(i+BATCH<pageList.length) await new Promise(r=>setTimeout(r,150));
+  }
+  // 売上高ソート選択中なら再描画
+  const sort=document.getElementById('peerSortMode')?.value;
+  if(sort==='rev_desc'||sort==='rev_asc') applyPeerFilter();
+}
+
+async function fetchCompanyRevenue(c){
+  const ec=c.edinet_code;
+  if(!ec) return;
+  const ticker=((c.sec_code||'').replace(/0$/,'')).slice(0,4);
+  // キャッシュ済みなら即更新
+  if(finCache[ec]?.f){
+    const rev=finCache[ec].f.revenue?finCache[ec].f.revenue/1e6:null;
+    c._rev=rev;
+    updateChipRevBadge(ticker,rev);
+    return;
+  }
+  try{
+    const d=await apiGet('/companies/'+ec);
+    const f=d.data?.latest_financials||d.data?.financials||d.latest_financials;
+    if(!f) return;
+    finCache[ec]={f,name:d.data?.name_ja||c.name_ja};
+    const rev=f.revenue?f.revenue/1e6:null;
+    c._rev=rev;
+    updateChipRevBadge(ticker,rev);
+  }catch(e){/* silent */}
+}
+
+// ─── Claude APIで30社の事業内容を一括生成 ──────────────────
+async function generatePeerDescriptions(pageList){
+  if(!pageList.length) return;
+  const lines=pageList.map((c,i)=>`${i+1}. ${c.name_ja||c.name}（${ind(c)}）`).join('\n');
+  const prompt=`以下の日本の上場企業について、各社の主な事業内容を**15〜25文字**の日本語で1行ずつ記述してください。番号付きリスト形式で出力し、余計な説明は不要です。\n\n${lines}`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:prompt}]})
+    });
+    const data=await r.json();
+    const text=data.content?.[0]?.text||'';
+    const descs=text.split('\n')
+      .map(l=>l.replace(/^\d+[\.\)]\s*/,'').trim())
+      .filter(l=>l.length>0);
+    descs.forEach((desc,i)=>{
+      if(i<pageList.length){
+        const ticker=((pageList[i].sec_code||'').replace(/0$/,'')).slice(0,4);
+        updateChipDesc(ticker,desc);
+      }
+    });
+  }catch(e){console.warn('[Valio] 事業内容生成失敗:',e.message);}
+}
+
+function updateChipDesc(ticker,desc){
+  const el=document.getElementById('desc-'+ticker);
+  if(el&&desc) el.textContent=desc;
 }
 
 function renderPagerBar(cur,total){
-  const existing=document.getElementById('peerPager');
   if(existing) existing.remove();
   if(total<=1) return;
   const bar=document.createElement('div');
