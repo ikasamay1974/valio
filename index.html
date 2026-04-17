@@ -312,6 +312,9 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
         <option value="food_restaurant">食品・外食</option>
         <option value="finance_bank">金融・銀行・証券・保険</option>
         <option value="logistics">物流・運輸</option>
+        <option value="energy">電力・ガス・エネルギー</option>
+        <option value="trading">卸売業・商社</option>
+        <option value="other_mfg">その他製造・素材・鉱業</option>
       </select>
     </div>
     <div class="ind-group">
@@ -530,6 +533,9 @@ const SECTOR_API_MAP={
   food_restaurant:    {industries:['食料品','水産・農林業','サービス業']},
   finance_bank:       {industries:['銀行業','保険業','証券、商品先物取引業','その他金融業']},
   logistics:          {industries:['陸運業','海運業','空運業','倉庫・運輸関連業']},
+  energy:             {industries:['電気・ガス業','石油・石炭製品']},
+  trading:            {industries:['卸売業']},
+  other_mfg:          {industries:['その他製品','鉱業']},
 };
 
 // ─── 業種フィールドを安全に取得 ──────────────────────────
@@ -635,6 +641,29 @@ const SUBSECTOR_DEF={
     {key:'logistics_air',      label:'空運・航空・航空貨物',      filter:c=>ind(c)==='空運業'},
     {key:'logistics_warehouse',label:'倉庫・フォワーダー・3PL',  filter:c=>ind(c)==='倉庫・運輸関連業'},
   ],
+  energy:[
+    {key:'all',             label:'全体（電力・ガス・エネルギー）',  filter:()=>true},
+    {key:'energy_elec',     label:'電力会社',                       filter:c=>ind(c)==='電気・ガス業'&&kw(c,['電力','電気','パワー','power','ホールディングス'])},
+    {key:'energy_gas',      label:'都市ガス・ガス事業',             filter:c=>ind(c)==='電気・ガス業'&&kw(c,['ガス','gas'])},
+    {key:'energy_oil',      label:'石油・石炭・精製',               filter:c=>ind(c)==='石油・石炭製品'},
+    {key:'energy_renew',    label:'再エネ・新電力',                 filter:c=>kw(c,['再生可能','再エネ','新電力','太陽光','風力','バイオ'])},
+  ],
+  trading:[
+    {key:'all',             label:'全体（卸売業・商社）',     filter:()=>true},
+    {key:'trading_sogo',    label:'総合商社',                 filter:c=>kw(c,['商事','物産','住友商','伊藤忠','丸紅','双日','豊田通商'])},
+    {key:'trading_senmon',  label:'専門商社',                 filter:c=>ind(c)==='卸売業'&&!kw(c,['商事','物産','住友商','伊藤忠','丸紅','双日','豊田通商'])},
+    {key:'trading_food',    label:'食品・農水産物卸',         filter:c=>kw(c,['食品','農','水産','飲料','酒','穀物','冷凍'])&&ind(c)==='卸売業'},
+    {key:'trading_pharma',  label:'医薬品・医療機器卸',       filter:c=>kw(c,['医薬','メディカル','医療','薬'])&&ind(c)==='卸売業'},
+    {key:'trading_energy',  label:'エネルギー・資源卸',       filter:c=>kw(c,['石油','エネルギー','資源','燃料','ガス'])&&ind(c)==='卸売業'},
+    {key:'trading_tech',    label:'IT・機械・電子部品卸',     filter:c=>kw(c,['電子','半導体','IT','情報','機械','部品'])&&ind(c)==='卸売業'},
+  ],
+  other_mfg:[
+    {key:'all',             label:'全体（その他製造・素材・鉱業）', filter:()=>true},
+    {key:'omfg_product',    label:'その他製品（日用品・娯楽等）',   filter:c=>ind(c)==='その他製品'},
+    {key:'omfg_mining',     label:'鉱業（資源採掘）',               filter:c=>ind(c)==='鉱業'},
+    {key:'omfg_daily',      label:'日用品・衛生用品・文具',         filter:c=>kw(c,['日用品','衛生','文具','トイレ','洗剤','化粧'])},
+    {key:'omfg_game',       label:'玩具・ゲーム・スポーツ用品',     filter:c=>kw(c,['玩具','おもちゃ','ゲーム','スポーツ','アウトドア'])},
+  ],
 };
 
 // ─── Keyword match helper ─────────────────────────────────
@@ -675,7 +704,9 @@ async function fetchAllCompanies(){
       if(list.length>0){
         const sample=list[0];
         console.log('[Valio] 企業リストのフィールド一覧:',Object.keys(sample).join(', '));
-        console.log('[Valio] サンプル企業:',JSON.stringify(sample));
+        // 全industryの一覧（ユニーク）をログ出力
+        const allInds=[...new Set(list.map(c=>c.industry||'').filter(Boolean))].sort();
+        console.log('[Valio] industry値一覧（全'+allInds.length+'種）:\n'+allInds.join('\n'));
       }
       _allCompaniesCache.data=list;
       return list;
@@ -915,8 +946,27 @@ async function onSectorChange(){
   }
   peerArea.innerHTML='<div class="info-note"><span class="spin"></span>企業データをEDINET DBから取得中...</div>';
   const companies=await loadSectorCompanies(s);
+
+  // ── デバッグ：取得結果をUIに表示 ──────────────────────────
+  if(!companies.length){
+    const allData=_allCompaniesCache.data;
+    const allCount=allData?allData.length:0;
+    const sampleInds=allData?[...new Set(allData.map(c=>c.industry||'').filter(Boolean))].slice(0,10):[];
+    const def=SECTOR_API_MAP[s];
+    peerArea.innerHTML=`<div class="info-note" style="color:var(--red-t)">
+      ⚠️ 企業データが取得できませんでした。<br>
+      全企業キャッシュ：${allCount}社<br>
+      フィルター業種：${JSON.stringify(def?.industries||[])}<br>
+      APIレスポンスのindustry例：${sampleInds.join('、') || 'なし'}<br>
+      Consoleを確認してください。
+    </div>`;
+    sub.innerHTML='<option value="">— データなし —</option>';
+    sub.disabled=true;
+    return;
+  }
+
   // サブセクタープルダウン生成
-  sub.innerHTML='<option value="">— 細分類を選択（全体を見るには「全体」を選択）—</option>';
+  sub.innerHTML='<option value="">— 細分類を選択 —</option>';
   (SUBSECTOR_DEF[s]||[]).forEach(ss=>{
     const cnt=companies.filter(ss.filter).length;
     const o=document.createElement('option');
@@ -1086,18 +1136,16 @@ function renderPeerPage(){
     const alreadySel=selCodes.has(ticker);
     return `<div class="peer-chip${alreadySel?' selected':''}" id="chip-${ticker}" onclick="togglePeer('${ticker}','${nameEsc}')">
       <div class="pc-left">
-        <div class="pc-name">${name}<span id="revbadge-${ticker}"></span></div>
-        <div class="pc-code">${ticker}</div>
+        <div class="pc-name">${name}</div>
+        <div class="pc-code">${ticker}&nbsp;<span id="revbadge-${ticker}"></span></div>
         <div class="pc-desc" id="desc-${ticker}">${industry}</div>
       </div>
       <div class="pc-check">✓</div>
     </div>`;
   }).join('');
   renderPagerBar(totalPages,totalPages);
-  // バックグラウンドで財務データ取得 → 売上高バッジ＋ソート更新
+  // バックグラウンドで財務データ取得 → 売上高バッジ＋財務サマリー更新
   prefetchPageRevenue(page);
-  // Claude APIで事業内容1行を生成
-  generatePeerDescriptions(page);
 }
 
 // ─── バックグラウンド：30社の売上高を取得してバッジ更新 ───
@@ -1107,20 +1155,37 @@ async function prefetchPageRevenue(pageList){
     await Promise.allSettled(pageList.slice(i,i+BATCH).map(c=>fetchCompanyRevenue(c)));
     if(i+BATCH<pageList.length) await new Promise(r=>setTimeout(r,150));
   }
-  // 売上高ソート選択中なら再描画
-  const sort=document.getElementById('peerSortMode')?.value;
-  if(sort==='rev_desc'||sort==='rev_asc') applyPeerFilter();
+  // 売上高ソート選択中でもapplyPeerFilter()は呼ばない（チラつき防止）
+  // ユーザーがソートを選び直したタイミングで反映される
 }
 
 async function fetchCompanyRevenue(c){
   const ec=c.edinet_code;
   if(!ec) return;
   const ticker=((c.sec_code||'').replace(/0$/,'')).slice(0,4);
-  // キャッシュ済みなら即更新
-  if(finCache[ec]?.f){
-    const rev=finCache[ec].f.revenue?finCache[ec].f.revenue/1e6:null;
+
+  // ★ edinetCache を先に埋めておく（togglePeer の /search をスキップさせる）
+  if(ticker) edinetCache[ticker]=ec;
+
+  const applyData=(f)=>{
+    const rev=f.revenue?f.revenue/1e6:null;
+    const op=f.operating_income?f.operating_income/1e6:null;
+    const opMgn=(rev&&rev>0&&op!=null)?op/rev:null;
     c._rev=rev;
+    const src=_peerDisplayList.find(x=>x.edinet_code===ec);
+    if(src) src._rev=rev;
+    // バッジ更新（コード行に表示）
     updateChipRevBadge(ticker,rev);
+    // 事業内容行：売上高 + 営業利益率
+    const descParts=[];
+    if(rev!=null) descParts.push('売上 '+fmtRevBadge(rev).replace(/<[^>]+>/g,''));
+    if(opMgn!=null) descParts.push('営業利益率 '+(opMgn*100).toFixed(1)+'%');
+    if(descParts.length) updateChipDesc(ticker, descParts.join('　'));
+  };
+
+  // キャッシュ済みなら即更新（API不要）
+  if(finCache[ec]?.f){
+    applyData(finCache[ec].f);
     return;
   }
   try{
@@ -1128,9 +1193,7 @@ async function fetchCompanyRevenue(c){
     const f=d.data?.latest_financials||d.data?.financials||d.latest_financials;
     if(!f) return;
     finCache[ec]={f,name:d.data?.name_ja||c.name_ja};
-    const rev=f.revenue?f.revenue/1e6:null;
-    c._rev=rev;
-    updateChipRevBadge(ticker,rev);
+    applyData(f);
   }catch(e){/* silent */}
 }
 
@@ -1166,6 +1229,7 @@ function updateChipDesc(ticker,desc){
 }
 
 function renderPagerBar(cur,total){
+  const existing=document.getElementById('peerPager');
   if(existing) existing.remove();
   if(total<=1) return;
   const bar=document.createElement('div');
@@ -1213,30 +1277,35 @@ async function togglePeer(ticker, name, altName){
     peers = peers.filter(p => p.code !== ticker);
     updateCount(); calcAll(); return;
   }
-  if(noEdinetCodes.has(ticker)) return; // 既知の未収録はスキップ
+  if(noEdinetCodes.has(ticker)) return;
 
   chip.classList.add('fetching'); chip.style.pointerEvents = 'none';
   try{
-    // ① EDINETコード解決（ticker → edinet_code）
+    // ① EDINETコード解決
+    // prefetch済みなら edinetCache に入っているのでスキップ
+    // なければ _peerDisplayList から sec_code で探す（APIコール削減）
     let ec = edinetCache[ticker];
     if(!ec){
-      // まずtickerで検索
+      const fromList=_peerDisplayList.find(c=>((c.sec_code||'').replace(/0$/,'')).slice(0,4)===ticker);
+      if(fromList?.edinet_code){
+        ec=fromList.edinet_code;
+        edinetCache[ticker]=ec;
+      }
+    }
+    if(!ec){
+      // 最終手段：/search
       let s = await apiGet('/search?q='+encodeURIComponent(ticker));
       let m = s.data.find(c=>(c.sec_code||'').startsWith(ticker));
-
-      // tickerでマッチしなければ会社名で再検索（ウォンテッドリー等のケース）
       if(!m && (altName||name)){
-        const q = altName||name;
-        s = await apiGet('/search?q='+encodeURIComponent(q));
+        s = await apiGet('/search?q='+encodeURIComponent(altName||name));
         m = s.data[0];
       }
-
       if(!m){
-        // 完全に見つからない → 未収録マーク
         noEdinetCodes.add(ticker);
         chip.classList.add('unavailable');
         chip.onclick = null;
-        chip.querySelector('.pc-desc').textContent = 'EDINET DB 未収録';
+        const descEl=chip.querySelector('.pc-desc');
+        if(descEl) descEl.textContent = 'EDINET DB 未収録';
         chip.querySelector('.pc-name').style.color = 'var(--text3)';
         chip.style.opacity = '0.45';
         chip.style.cursor = 'not-allowed';
@@ -1245,7 +1314,7 @@ async function togglePeer(ticker, name, altName){
       ec = m.edinet_code; edinetCache[ticker] = ec;
     }
 
-    // ② EDINET財務データ取得（確実に完了させる）
+    // ② 財務データ取得（prefetch済みならキャッシュ使用）
     let rawF = finCache[ec]?.f ?? null;
     let companyName = finCache[ec]?.name ?? name;
     if(!rawF){
@@ -1265,7 +1334,6 @@ async function togglePeer(ticker, name, altName){
       month:rawF.fiscal_year||'', isPrivate:false, ...c});
     selCodes.add(ticker);
     chip.classList.add('selected');
-    // 売上高バッジを更新（財務取得済みのため追加API不要）
     updateChipRevBadge(ticker, c.rev);
   }catch(e){
     const codeEl = chip.querySelector('.pc-code');
