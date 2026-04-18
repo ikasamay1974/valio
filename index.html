@@ -154,6 +154,27 @@ tbody tr.rstat td.mn{font-family:var(--mono);font-size:12px;color:var(--text)}
 .ff-method-adj{font-size:12px;font-weight:500;font-family:var(--mono);color:var(--amber-d);margin-top:2px}
 .ff-method-delta{font-size:11.5px;font-weight:500;margin-top:3px}
 .du{color:var(--green-t)}.dd{color:var(--red-t)}
+/* ── 総合レンジ合成ボックス ── */
+.ff-range-box{margin-top:12px;margin-bottom:2px;border-radius:var(--rl);overflow:hidden;border:.5px solid var(--teal-m)}
+.ff-range-header{background:var(--teal);padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+.ff-range-title{font-size:10px;font-weight:700;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.09em}
+.ff-range-badge{font-size:9.5px;font-weight:600;color:rgba(255,255,255,.7);background:rgba(255,255,255,.15);padding:2px 8px;border-radius:10px}
+.ff-range-body{background:var(--bg);padding:14px 18px}
+.ff-range-consensus{text-align:center;margin-bottom:14px}
+.ff-range-clabel{font-size:9.5px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ff-range-cnum{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--teal);line-height:1.1}
+.ff-range-csub{font-size:10px;color:var(--text3);margin-top:2px}
+.ff-range-track-wrap{position:relative;padding:0 2px;margin-bottom:6px}
+.ff-range-track{height:8px;border-radius:4px;background:var(--bg3);position:relative;overflow:visible}
+.ff-range-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#5DCAA5,var(--teal));position:absolute;top:0;opacity:.7}
+.ff-range-dot{width:16px;height:16px;border-radius:50%;background:var(--teal);position:absolute;top:-4px;transform:translateX(-50%);border:2.5px solid var(--bg);box-shadow:0 2px 6px rgba(0,0,0,.22)}
+.ff-range-endpoints{display:flex;justify-content:space-between;align-items:flex-start;margin-top:6px}
+.ff-range-ep{text-align:center}
+.ff-range-ep-label{font-size:9px;color:var(--text3);margin-bottom:1px}
+.ff-range-ep-num{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--text2)}
+.ff-range-note{font-size:9.5px;color:var(--text3);text-align:center;margin-top:10px;padding-top:10px;border-top:.5px solid var(--border)}
+.ff-range-adj{font-size:10.5px;color:var(--amber-d);text-align:center;margin-top:6px;font-weight:600;padding:5px 10px;background:var(--amber-l);border-radius:6px}
+@media(max-width:600px){.ff-range-cnum{font-size:20px}.ff-range-ep-num{font-size:11px}}
 
 .disc-panel{transition:opacity .2s}
 .disc-panel.locked{opacity:.4;pointer-events:none}
@@ -188,6 +209,13 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
 .recent-chip-code{font-size:10px;font-family:var(--mono,monospace);color:var(--text3,#999);margin-left:2px}
 .recent-chip-del{font-size:11px;color:var(--text3,#999);margin-left:2px;line-height:1}
 .recent-chip-del:hover{color:#791F1F}
+.private-recent-bar{margin-top:10px;min-height:0}
+.private-recent-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border:.5px solid var(--amber-d,#633806);border-radius:20px;background:var(--amber-l,#FAEEDA);cursor:pointer;font-size:12px;color:var(--text,#1a1a1a);transition:all .15s}
+.private-recent-chip:hover{opacity:.8}
+.private-recent-chip-name{font-weight:500}
+.private-recent-chip-sub{font-size:10px;color:var(--text3);margin-left:2px;font-family:var(--mono)}
+.private-recent-chip-del{font-size:11px;color:var(--text3);margin-left:4px;line-height:1}
+.private-recent-chip-del:hover{color:#791F1F}
 
 /* Manual peer entry */
 .manual-peer-wrap{margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
@@ -289,6 +317,7 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
       <div class="ig"><label>現金・預金（百万円）</label><input type="number" id="pCash" placeholder="0" oninput="calcAll()"></div>
     </div>
     <div class="info-note">EBITDAはオーナー役員報酬・のれん償却等の正常化調整後（Normalized EBITDA）の値を推奨します。</div>
+    <div id="privateRecentBar" class="private-recent-bar" style="display:none"></div>
   </div>
 </div>
 
@@ -357,6 +386,7 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
     <div class="ff-title" id="ffTitle"></div>
     <div class="ff-subtitle" id="ffSubtitle"></div>
     <div class="ff-chart" id="ffChart"></div>
+    <div id="ffRangeSummary" style="display:none"></div>
     <div class="ff-legend">
       <div class="ff-leg-item"><div class="ff-leg-box" style="background:#1D9E75;opacity:.25"></div>ピアレンジ（25%ile〜75%ile）</div>
       <div class="ff-leg-item"><div class="ff-leg-box" style="background:#1D9E75"></div>中央値 Implied</div>
@@ -418,6 +448,66 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
 // ─── Recent companies (localStorage, 最大3社) ────────────
 const RECENT_KEY = 'valio_recent_targets';
 const RECENT_MAX = 3;
+
+// ─── 非上場企業履歴 (localStorage, 最大3社) ───────────────
+const PRIVATE_KEY = 'valio_private_recent';
+const PRIVATE_MAX = 3;
+let _privateSaveTimer = null;
+
+function savePrivateRecent(){
+  const name = (document.getElementById('pName')?.value||'').trim();
+  if(!name) return;
+  const entry = {
+    name,
+    rev:   document.getElementById('pRev')?.value  ||'',
+    op:    document.getElementById('pOp')?.value   ||'',
+    eb:    document.getElementById('pEb')?.value   ||'',
+    np:    document.getElementById('pNp')?.value   ||'',
+    bv:    document.getElementById('pBv')?.value   ||'',
+    debt:  document.getElementById('pDebt')?.value ||'',
+    cash:  document.getElementById('pCash')?.value ||'',
+    savedAt: new Date().toLocaleDateString('ja-JP')
+  };
+  let list = getPrivateRecent().filter(r=>r.name!==name);
+  list.unshift(entry);
+  list = list.slice(0, PRIVATE_MAX);
+  try{ localStorage.setItem(PRIVATE_KEY, JSON.stringify(list)); }catch(e){}
+  renderPrivateRecent();
+}
+
+function getPrivateRecent(){
+  try{ const v=localStorage.getItem(PRIVATE_KEY); return v?JSON.parse(v):[]; }catch(e){ return []; }
+}
+
+function removePrivateRecent(name){
+  let list = getPrivateRecent().filter(r=>r.name!==name);
+  try{ localStorage.setItem(PRIVATE_KEY, JSON.stringify(list)); }catch(e){}
+  renderPrivateRecent();
+}
+
+function loadPrivateRecent(name){
+  const r = getPrivateRecent().find(x=>x.name===name);
+  if(!r) return;
+  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
+  set('pName', r.name); set('pRev', r.rev); set('pOp', r.op);
+  set('pEb',   r.eb);   set('pNp', r.np);  set('pBv', r.bv);
+  set('pDebt', r.debt); set('pCash', r.cash);
+  calcAll();
+}
+
+function renderPrivateRecent(){
+  const el = document.getElementById('privateRecentBar');
+  if(!el) return;
+  const list = getPrivateRecent();
+  if(!list.length){ el.style.display='none'; return; }
+  el.style.display='';
+  el.innerHTML = '<div class="recent-label">保存済み非上場企業</div><div class="recent-chips">' +
+    list.map(r=>`<div class="private-recent-chip" onclick="loadPrivateRecent('${r.name.replace(/'/g,"\\'")}')">
+      <span class="private-recent-chip-name">${r.name}</span>
+      <span class="private-recent-chip-sub">${r.savedAt||''}</span>
+      <span class="private-recent-chip-del" onclick="event.stopPropagation();removePrivateRecent('${r.name.replace(/'/g,"\\'")}')">×</span>
+    </div>`).join('') + '</div>';
+}
 
 function saveRecent(t){
   if(!t||!t.code||t.code==='—') return;
@@ -1487,6 +1577,7 @@ function setMode(m){
   document.getElementById('listedMode').style.display=m==='listed'?'':'none';
   document.getElementById('privateMode').style.display=m==='private'?'':'none';
   document.getElementById('tgtInfoBox').innerHTML='';
+  if(m==='private') renderPrivateRecent();
   hideAll();calcAll();
 }
 function hideAll(){['tableCard','impCard','adjCard','aiCard'].forEach(id=>document.getElementById(id).style.display='none')}
@@ -1506,6 +1597,12 @@ function calcAll(){
   document.getElementById('ctrlV').textContent=document.getElementById('ctrl').value+'%';
   const t=mode==='listed'?tgt:getPrivateTgt();
   if(!t||!peers.length){hideAll();return;}
+
+  // 非上場モードの場合、1秒デバウンスで保存
+  if(mode==='private' && t.name && t.name!=='（対象会社）'){
+    clearTimeout(_privateSaveTimer);
+    _privateSaveTimer = setTimeout(savePrivateRecent, 1000);
+  }
   ['tableCard','impCard','adjCard','aiCard'].forEach(id=>document.getElementById(id).style.display='');
 
   // 異常値マップ構築（各ピアの各指標が除外対象かどうか）
@@ -1713,6 +1810,63 @@ function renderFootballField(t,mPer,mPbr,mEvR,mEvEb,cPer,cPbr,cEvR,cEvEb){
     </div>`;
   }).join('');
   document.getElementById('ffMethodCards').innerHTML=cards;
+
+  // ── 総合レンジ合成ボックス ─────────────────────────────
+  const rangeMids = methods.map(m => m.range.mid).filter(x => x != null);
+  const rangeLos  = methods.map(m => m.range.lo).filter(x => x != null);
+  const rangeHis  = methods.map(m => m.range.hi).filter(x => x != null);
+  const rsEl = document.getElementById('ffRangeSummary');
+
+  if (rangeMids.length >= 2) {
+    const sortedMids = rangeMids.slice().sort((a, b) => a - b);
+    const overallLo  = Math.min(...rangeLos);
+    const overallHi  = Math.max(...rangeHis);
+    const loMid      = sortedMids[0];
+    const hiMid      = sortedMids[sortedMids.length - 1];
+    const consMid    = med(rangeMids);
+    const span       = overallHi - overallLo || 1;
+    const barPct     = v => Math.max(0, Math.min(100, (v - overallLo) / span * 100));
+    const fillLeft   = barPct(loMid);
+    const fillWidth  = Math.max(2, barPct(hiMid) - fillLeft);
+    const dotPos     = barPct(consMid);
+    const adjHtml    = hasAdj
+      ? `<div class="ff-range-adj">🔶 調整後コンセンサス（DLOM/サイズP適用）: ${fmtAx(consMid * af)}</div>`
+      : '';
+    rsEl.innerHTML = `<div class="ff-range-box">
+      <div class="ff-range-header">
+        <div class="ff-range-title">推奨バリュエーションレンジ</div>
+        <div class="ff-range-badge">${methods.length}手法合成</div>
+      </div>
+      <div class="ff-range-body">
+        <div class="ff-range-consensus">
+          <div class="ff-range-clabel">コンセンサス中央値</div>
+          <div class="ff-range-cnum">${fmtAx(consMid)}</div>
+          <div class="ff-range-csub">全手法の中央値Implied株式価値の中央値</div>
+        </div>
+        <div class="ff-range-track-wrap">
+          <div class="ff-range-track">
+            <div class="ff-range-fill" style="left:${fillLeft}%;width:${fillWidth}%"></div>
+            <div class="ff-range-dot" style="left:${dotPos}%"></div>
+          </div>
+        </div>
+        <div class="ff-range-endpoints">
+          <div class="ff-range-ep">
+            <div class="ff-range-ep-label">保守的試算</div>
+            <div class="ff-range-ep-num">${fmtAx(loMid)}</div>
+          </div>
+          <div class="ff-range-ep" style="text-align:right">
+            <div class="ff-range-ep-label">強気試算</div>
+            <div class="ff-range-ep-num">${fmtAx(hiMid)}</div>
+          </div>
+        </div>
+        <div class="ff-range-note">各手法の中央値Impliedの最小〜最大。●はコンセンサス推定値。</div>
+        ${adjHtml}
+      </div>
+    </div>`;
+    rsEl.style.display = '';
+  } else {
+    rsEl.style.display = 'none';
+  }
 }
 
 // ─── AI ──────────────────────────────────────────────────
@@ -1738,9 +1892,12 @@ function generateAnalysis(t, peers, mPer, mPbr, mEvR, mEvEb, cPer, cPbr, cEvR, c
 
   let posLabel, posSentence;
   if(t.isPrivate){
-    const iEVlbl = iEV ? `¥${Math.round(iEV).toLocaleString()}M` : '算出不可';
-    posLabel = 'Implied EV';
-    posSentence = `${t.name}のEV/EBITDA中央値ベースImplied EVは${iEVlbl}と試算される。`;
+    const iEqLbl = iEq!=null ? `¥${Math.round(iEq).toLocaleString()}M` : '算出不可';
+    const iEVlbl = iEV!=null ? `¥${Math.round(iEV).toLocaleString()}M` : '—';
+    posLabel = 'Implied 株式価値';
+    posSentence = iEq!=null
+      ? `${t.name}のEV/EBITDA中央値ベースImplied 株式価値は${iEqLbl}と試算される（Implied EV ${iEVlbl}からネットデット¥${Math.round(nd).toLocaleString()}Mを控除）。`
+      : `${t.name}のEBITDAが未入力のため、EV/EBITDAベースのImplied 株式価値は算出不可。PER・PBRベースの試算を参照されたい。`;
   } else if(avgGap === null){
     posSentence = `${t.name}は${peerN}社比較において一部指標が算出不可であるが、開示財務データから概ね適正水準と判断される。`;
     posLabel = '適正';
@@ -1796,8 +1953,9 @@ function generateAnalysis(t, peers, mPer, mPbr, mEvR, mEvEb, cPer, cPbr, cEvR, c
     const ctrl = +document.getElementById('ctrl').value;
     const af = (1-dlom/100)*(1-sz/100)*(1+ctrl/100);
     const adjEV = iEV ? iEV * af : null;
-    if(adjEV){
-      adjSentence = `非上場ディスカウント（DLOM ${dlom}%・サイズプレミアム ${sz}%）適用後の調整済Implied EVは¥${Math.round(adjEV).toLocaleString()}Mとなる。${ctrl>0?`コントロールプレミアム${ctrl}%を加算しており、支配権取得価格として提示される場合の参考水準である。`:''}`;
+    const adjEq = adjEV!=null ? adjEV - nd : null;
+    if(adjEq!=null){
+      adjSentence = `非上場ディスカウント（DLOM ${dlom}%・サイズプレミアム ${sz}%）適用後の調整済Implied 株式価値は¥${Math.round(adjEq).toLocaleString()}Mとなる（調整済Implied EV: ¥${Math.round(adjEV).toLocaleString()}Mからネットデット控除）。${ctrl>0?`コントロールプレミアム${ctrl}%を加算しており、支配権取得価格として提示される場合の参考水準である。`:''}`;
     }
   }
 
