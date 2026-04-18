@@ -1234,11 +1234,15 @@ function renderPeerPage(){
     </div>`;
   }).join('');
   renderPagerBar(totalPages,totalPages);
-  // バックグラウンドで財務データ取得 → 売上高バッジ＋財務サマリー更新
-  prefetchPageRevenue(page);
+  // prefetchPageRevenue 廃止 → クリック時のみAPIコール（レート制限対策）
+  // edinetCache だけはAPIなしでprefill（togglePeer高速化）
+  page.forEach(c=>{
+    const ticker=((c.sec_code||'').replace(/0$/,'')).slice(0,4);
+    if(ticker && c.edinet_code) edinetCache[ticker]=c.edinet_code;
+  });
 }
 
-// ─── バックグラウンド：30社の売上高を取得してバッジ更新 ───
+// ─── バックグラウンド：売上高取得（廃止・参照のみ残す） ───
 async function prefetchPageRevenue(pageList){
   const BATCH=5;
   for(let i=0;i<pageList.length;i+=BATCH){
