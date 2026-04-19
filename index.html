@@ -606,7 +606,7 @@ function loadRecent(code){
 }
 
 
-const API_KEY='edb_b771a469ac4f384492ccd80177bb10d1';
+const API_KEY='edb_637e3f14917ad0b833d0234efd69d710';
 const BASE='https://edinetdb.jp/v1';
 
 // ─── Sector → TSE業種コードマッピング（全て業種ベース）────
@@ -1412,10 +1412,16 @@ async function togglePeer(ticker, name, altName){
     let rawF = finCache[ec]?.f ?? null;
     let companyName = finCache[ec]?.name ?? name;
     if(!rawF){
-      const d = await apiGet('/companies/'+ec);
-      rawF = d.data.latest_financials;
-      companyName = d.data.name_ja || name;
-      finCache[ec] = {f: rawF, name: companyName};
+      let d;
+      try{
+        d = await apiGet('/companies/'+ec);
+      }catch(apiErr){
+        // 500エラーはそのまま再throw（catchブロックで取得不可マーク）
+        throw apiErr;
+      }
+      rawF = d.data?.latest_financials || d.data?.financials;
+      companyName = d.data?.name_ja || name;
+      if(rawF) finCache[ec] = {f: rawF, name: companyName};
     }
     if(!rawF) throw new Error('財務データなし');
 
@@ -1430,14 +1436,28 @@ async function togglePeer(ticker, name, altName){
     chip.classList.add('selected');
     updateChipRevBadge(ticker, c.rev);
   }catch(e){
-    const codeEl = chip.querySelector('.pc-code');
-    chip.style.border = '.5px solid var(--red-t)';
-    if(codeEl) codeEl.textContent = '取得失敗';
     console.error('togglePeer error:', ticker, e.message);
-    setTimeout(()=>{
-      chip.style.border = '';
-      if(codeEl) codeEl.textContent = ticker;
-    }, 3000);
+    const is5xx = /50[0-9]/.test(e.message);
+    const descEl = chip.querySelector('.pc-desc');
+    const codeEl = chip.querySelector('.pc-code');
+    if(is5xx){
+      // サーバーエラー：このチップを永続的に取得不可マーク（他チップは影響なし）
+      noEdinetCodes.add(ticker);
+      chip.classList.add('unavailable');
+      chip.onclick = null;
+      chip.style.opacity = '0.4';
+      chip.style.cursor = 'not-allowed';
+      if(descEl) descEl.textContent = 'EDINET DBサーバーエラー（他の企業を選択ください）';
+      if(codeEl) codeEl.style.color = 'var(--red-t)';
+    } else {
+      // その他エラー：3秒後にリセット
+      chip.style.border = '.5px solid var(--red-t)';
+      if(codeEl) codeEl.textContent = '取得失敗';
+      setTimeout(()=>{
+        chip.style.border = '';
+        if(codeEl) codeEl.textContent = ticker;
+      }, 3000);
+    }
   }finally{
     chip.classList.remove('fetching');
     chip.style.pointerEvents = '';
