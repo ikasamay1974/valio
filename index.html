@@ -1746,7 +1746,7 @@ async function selectTgt(ec,name,sec){
           <button class="price-refresh-btn" onclick="refreshPrice('${t4}')" title="最新株価を再取得">↺ 再取得</button>
         </div>
       </div>
-      <div id="mktCapFallbackWrap" style="display:${evMissing?'':'none'};margin-top:8px;padding:8px 0 2px;border-top:.5px solid rgba(255,255,255,.2)">
+      <div id="mktCapFallbackWrap" style="display:${evMissing?'block':'none'};margin-top:8px;padding:8px 0 2px;border-top:.5px solid rgba(255,255,255,.2)">
         <div style="font-size:11px;color:var(--teal);margin-bottom:6px">
           ${sharesMissing
             ? '⚠️ 発行済株式数がEDINETから取得できませんでした。'
