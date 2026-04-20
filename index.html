@@ -373,6 +373,7 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
       <th>営業利益</th><th>EBITDA</th><th>純利益</th>
       <th>PER</th><th>PBR</th><th>EV/Rev</th><th>EV/EBITDA</th>
       <th style="text-align:left;min-width:70px">ソース</th>
+      <th style="width:28px"></th>
     </tr></thead>
     <tbody id="tbody"></tbody>
   </table></div>
@@ -830,9 +831,10 @@ let mode='listed',tgt=null,peers=[],selCodes=new Set();
 const edinetCache={};   // ticker → edinet_code
 const finCache={};      // edinet_code → raw financials object（速度改善：再取得をスキップ）
 
-// ─── リアルタイム株価取得 ─────────────────────────────────
-// Yahoo Finance (allorigins.win プロキシ経由)
-// AbortController でタイムアウト制御（AbortSignal.timeout より互換性が高い）
+// ─── 株価取得（Yahoo Finance プロキシ経由・前日終値）────────
+// ブラウザから直接呼べるCORSプロキシ経由でYahoo Financeを叩く。
+// 失敗時はEDINET有報期末株価へ静かにフォールバック（calcFin内で処理）。
+// fetchWithTimeout: タイムアウト付き fetch
 function fetchWithTimeout(url, ms) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
@@ -841,49 +843,38 @@ function fetchWithTimeout(url, ms) {
 
 async function fetchRealtimePrice(ticker) {
   const code = ticker.replace(/\D/g, '').slice(0, 4);
-  const symbol = code + '.T'; // 東証フォーマット (例: 4431.T)
-  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
-
-  // プロキシを順番に試す（allorigins.win が主力）
+  const symbol = code + '.T';
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
   const proxies = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
     `https://corsproxy.io/?${encodeURIComponent(yahooUrl)}`,
-    // ③ 直接アクセス（CORS許可環境向け）
     yahooUrl,
   ];
-
   for (const proxyUrl of proxies) {
     try {
-      console.log(`CompScan: 株価取得試行 → ${proxyUrl.slice(0, 80)}...`);
-      const res = await fetchWithTimeout(proxyUrl, 8000);
-      if (!res.ok) {
-        console.warn(`CompScan: HTTP ${res.status}`, proxyUrl.slice(0, 60));
-        continue;
-      }
+      const res = await fetchWithTimeout(proxyUrl, 7000);
+      if (!res.ok) continue;
       const data = await res.json();
       const meta = data?.chart?.result?.[0]?.meta;
-      if (!meta) {
-        console.warn('CompScan: レスポンスに meta なし', JSON.stringify(data).slice(0, 100));
-        continue;
-      }
-      const price = meta.regularMarketPrice ?? meta.previousClose;
-      if (!price || price <= 0) {
-        console.warn('CompScan: 価格が無効', price);
-        continue;
-      }
+      if (!meta) continue;
+      // previousClose = 前日終値（市場クローズ後に確定）
+      const price = meta.previousClose ?? meta.chartPreviousClose ?? meta.regularMarketPrice;
+      if (!price || price <= 0) continue;
+      // 直近取引日の日付
       const ts = meta.regularMarketTime;
-      const date = ts
-        ? new Date(ts * 1000).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
-        : new Date().toLocaleDateString('ja-JP');
-      console.log(`CompScan ✅ 株価取得成功: ${symbol} = ¥${price} (${date})`);
-      return { price, date, source: 'Yahoo Finance' };
+      const dateStr = ts
+        ? new Date(ts * 1000).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })
+        : '—';
+      console.log(`[Valio] 株価取得 ✅ ${symbol} 前日終値 ¥${price} (${dateStr})`);
+      return { price, date: dateStr, source: 'Yahoo Finance' };
     } catch (e) {
-      console.warn(`CompScan: エラー (${e.name})`, e.message, proxyUrl.slice(0, 60));
+      console.log(`[Valio] プロキシ失敗 (${e.name}): ${proxyUrl.slice(0,60)}`);
     }
   }
-  console.warn(`CompScan ❌ 株価取得失敗: ${symbol} - 全プロキシ不応答。手動入力してください。`);
+  console.log(`[Valio] 株価取得不可 ${symbol} → EDINET期末株価で代替`);
   return null;
 }
+
 
 // 株価 ＋ EDINET財務 → マルチプル再計算
 function applyRealtimePrice(c, price, f){
@@ -1429,9 +1420,10 @@ async function togglePeer(ticker, name, altName){
     let c = calcFin(rawF);
     const rtPrice = await fetchRealtimePrice(ticker);
     if(rtPrice) c = applyRealtimePrice(c, rtPrice.price, rawF);
+    const priceSource = rtPrice ? 'Yahoo Finance' : 'EDINET';
 
     peers.push({code:ticker, edinetCode:ec, name:companyName,
-      month:rawF.fiscal_year||'', isPrivate:false, ...c});
+      month:rawF.fiscal_year||'', isPrivate:false, priceSource, ...c});
     selCodes.add(ticker);
     chip.classList.add('selected');
     updateChipRevBadge(ticker, c.rev);
@@ -1538,11 +1530,11 @@ async function selectTgt(ec,name,sec){
       ...c
     };
 
-    // 株価情報ラベル
+    // 株価ラベル（ユーザーに何の株価か明示）
     const priceLabel = rtPrice
-      ? `📡 Yahoo Finance取得　${rt.date}`
-      : (initPrice ? `📅 有報期末株価（${f.submit_date ? f.submit_date.split(' ')[0] : ''}）` : '株価取得失敗');
-    const srcLabel = rtPrice ? 'Yahoo Finance' : (initPrice ? '有報時点' : '未取得');
+      ? `前日終値　${rt.date}　※Yahoo Finance経由`
+      : (initPrice ? `有報期末株価　${f.submit_date ? f.submit_date.split(' ')[0] : ''}　※前日終値取得不可` : '株価未取得');
+    const srcLabel = rtPrice ? '前日終値' : (initPrice ? '有報時点' : '未取得');
 
     document.getElementById('tgtInfoBox').innerHTML=`<div class="tgt-info">
       <div class="tgt-name">${tgt.name}&nbsp;<span class="badge b-target">TARGET</span>&nbsp;<span class="badge b-api">EDINET DB</span></div>
@@ -1653,19 +1645,19 @@ function calcAll(){
 }
 
 function renderTable(t,mPer,mPbr,mEvR,mEvEb,aPer,aPbr,aEvR,aEvEb,outlierMap,nExcluded){
-  // 株価基準日ラベル
-  const rtPeers=peers.filter(p=>p.realtimeDate);
-  const histPeers=peers.filter(p=>!p.realtimeDate);
+  // 株価基準日ラベル：前日終値取得済み社数とEDINET期末株価社数を表示
+  const rtPeers  = peers.filter(p=>p.priceSource==='Yahoo Finance');
+  const histPeers= peers.filter(p=>p.priceSource!=='Yahoo Finance');
   const tDate=t.submitDate||'';
   let dateLabel='';
-  if(rtPeers.length){
-    const latestRt=[...new Set(rtPeers.map(p=>p.realtimeDate))].sort().reverse()[0];
-    dateLabel=`📡 ${rtPeers.length}社リアルタイム株価（${latestRt}　)`;
-    if(histPeers.length)dateLabel+=`　|　${histPeers.length}社は有報時点の期末株価`;
+  if(rtPeers.length && histPeers.length){
+    dateLabel=`${rtPeers.length}社：前日終値（Yahoo Finance）　|　${histPeers.length}社：有報期末株価`;
+  }else if(rtPeers.length){
+    dateLabel=`株価：前日終値（Yahoo Finance）`;
   }else{
     const dates=peers.map(p=>p.submitDate).filter(Boolean);
     const latest=dates.sort().reverse()[0]||tDate;
-    dateLabel=`📅 有報提出時点の期末株価　最新 ${latest?latest.split(' ')[0]:''}`;
+    dateLabel=`株価：有報提出時点の期末株価　最新 ${latest?latest.split(' ')[0]:''}　※前日終値の取得に失敗`;
   }
   document.getElementById('dataDateLabel').textContent=dateLabel;
   const nL='<span class="na">非上場</span>';
@@ -1676,8 +1668,10 @@ function renderTable(t,mPer,mPbr,mEvR,mEvEb,aPer,aPbr,aEvR,aEvEb,outlierMap,nExc
     <td>${fmt(t.rev)}</td><td>${fmt(t.op)}</td><td>${fmt(t.ebitda)}</td><td>${fmt(t.np)}</td>
     <td>${t.per!=null?fmtX(t.per):nL}</td><td>${t.pbr!=null?fmtX(t.pbr):nL}</td>
     <td>${t.evRev!=null?fmtX(t.evRev):nL}</td><td>${t.evEb!=null?fmtX(t.evEb):nL}</td>
-    <td>${tSrc}</td></tr>`;
-  peers.forEach(p=>{h+=`<tr>
+    <td>${tSrc}</td><td></td></tr>`;
+  peers.forEach(p=>{
+    const safeCode=p.code.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    h+=`<tr>
     <td>${p.code}</td><td>${p.name}</td><td>${p.month}</td>
     <td>${fmt(p.ev)}</td><td>${fmt(p.mktCap)}</td>
     <td>${fmt(p.rev)}</td><td>${fmt(p.op)}</td><td>${fmt(p.ebitda)}</td><td>${fmt(p.np)}</td>
@@ -1685,10 +1679,15 @@ function renderTable(t,mPer,mPbr,mEvR,mEvEb,aPer,aPbr,aEvR,aEvEb,outlierMap,nExc
     <td>${fmtCell(p.code,'pbr',outlierMap)}</td>
     <td>${fmtCell(p.code,'evRev',outlierMap)}</td>
     <td>${fmtCell(p.code,'evEb',outlierMap)}</td>
-    <td><span class="badge b-api">EDINET DB</span></td></tr>`;});
+    <td><span class="badge b-api">EDINET DB</span></td>
+    <td><button onclick="removePeerRow('${safeCode}')" title="このピアを削除"
+      style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--text3);padding:0 3px;line-height:1;opacity:.55"
+      onmouseover="this.style.opacity='1';this.style.color='var(--red-t)'"
+      onmouseout="this.style.opacity='.55';this.style.color='var(--text3)'">×</button></td></tr>`;
+  });
   const sr=(l,a,b,c,d)=>`<tr class="rstat"><td colspan="3">${l}</td><td></td><td></td><td></td><td></td><td></td><td></td>
     <td class="mn">${a!=null?a.toFixed(1)+'x':'—'}</td><td class="mn">${b!=null?b.toFixed(1)+'x':'—'}</td>
-    <td class="mn">${c!=null?c.toFixed(1)+'x':'—'}</td><td class="mn">${d!=null?d.toFixed(1)+'x':'—'}</td><td></td></tr>`;
+    <td class="mn">${c!=null?c.toFixed(1)+'x':'—'}</td><td class="mn">${d!=null?d.toFixed(1)+'x':'—'}</td><td></td><td></td></tr>`;
   h+=sr('平均値（ピア'+peers.length+'社）',aPer,aPbr,aEvR,aEvEb);
   h+=sr('中央値（ピア'+peers.length+'社）',mPer,mPbr,mEvR,mEvEb);
   // 除外注記
@@ -2145,6 +2144,16 @@ function removeManualPeer(code,chip){
   peers=peers.filter(p=>p.code!==code);
   selCodes.delete(code);
   if(chip)chip.remove();
+  updateCount();calcAll();
+}
+
+// ─── Compsテーブル行削除（×ボタン）───────────────────────
+function removePeerRow(code){
+  peers=peers.filter(p=>p.code!==code);
+  selCodes.delete(code);
+  // ピアチップの選択状態も解除
+  const chip=document.getElementById('chip-'+code);
+  if(chip) chip.classList.remove('selected');
   updateCount();calcAll();
 }
 
