@@ -197,6 +197,68 @@ tbody tr.rstat td.mn{font-family:var(--mono);font-size:12px;color:var(--text)}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
 .spin{display:inline-block;width:11px;height:11px;border:2px solid var(--teal-l);border-top-color:var(--teal);border-radius:50%;animation:sp .7s linear infinite;margin-right:5px;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
+/* ─── Welcome Banner ─────────────────────────────────────── */
+.welcome-banner{
+  background:var(--bg);border:.5px solid var(--border);
+  border-radius:var(--rl);margin-bottom:10px;overflow:hidden;
+}
+.wb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;cursor:pointer;gap:12px;
+  background:linear-gradient(135deg,var(--navy) 0%,#2a5298 100%);
+}
+.wb-header:hover{filter:brightness(1.08)}
+.wb-title{font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.wb-title-sub{font-size:11px;color:rgba(255,255,255,.65);font-weight:400;margin-left:4px}
+.wb-toggle{font-size:11px;color:rgba(255,255,255,.6);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.wb-body{padding:16px 18px 14px;display:none}
+.wb-body.open{display:block}
+.wb-flow{display:flex;align-items:flex-start;gap:0;margin-bottom:14px;flex-wrap:wrap}
+.wb-step{
+  flex:1;min-width:160px;background:var(--bg2);
+  border:.5px solid var(--border);border-radius:var(--r);
+  padding:11px 13px;position:relative;
+}
+.wb-step-num{
+  font-size:10px;font-weight:700;color:var(--teal);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;
+}
+.wb-step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.wb-step-desc{font-size:11.5px;color:var(--text2);line-height:1.55}
+.wb-arrow{
+  display:flex;align-items:center;padding:0 8px;
+  font-size:16px;color:var(--text3);flex-shrink:0;align-self:center;
+}
+@media(max-width:600px){.wb-flow{flex-direction:column;gap:6px}.wb-arrow{transform:rotate(90deg);padding:4px 0}}
+.wb-note{
+  font-size:11px;color:var(--text2);background:var(--teal-l);
+  border:.5px solid rgba(29,158,117,.25);border-radius:var(--r);
+  padding:8px 12px;line-height:1.65;
+}
+.wb-dismiss{
+  float:right;font-size:11px;color:var(--text3);
+  border:none;background:none;cursor:pointer;margin-left:8px;
+  font-family:var(--sans);padding:0;
+}
+.wb-dismiss:hover{color:var(--text)}
+
+/* ─── Step Badge ─────────────────────────────────────────── */
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.step-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--navy);color:#fff;
+  font-size:10px;font-weight:700;flex-shrink:0;
+}
+.step-badge.done{background:var(--teal-m)}
+.step-label{font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em}
+.step-connector{
+  width:2px;height:12px;background:var(--border);
+  margin:0 auto 10px;margin-left:19px;
+  display:none;
+}
+.step-connector.visible{display:block}
 footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;padding-bottom:14px}
 
 
@@ -288,9 +350,48 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
   <span class="ver">v1.0 β</span>
 </div>
 
+<!-- Welcome Banner -->
+<div class="welcome-banner" id="welcomeBanner">
+  <div class="wb-header" onclick="toggleWelcome()">
+    <div class="wb-title">
+      📊 Valioの使い方
+      <span class="wb-title-sub">— 3ステップでTrading Compsを自動生成</span>
+    </div>
+    <div class="wb-toggle" id="wbToggleLabel">▼ 開く</div>
+  </div>
+  <div class="wb-body" id="wbBody">
+    <div class="wb-flow">
+      <div class="wb-step">
+        <div class="wb-step-num">Step 1</div>
+        <div class="wb-step-title">ターゲット企業を選ぶ</div>
+        <div class="wb-step-desc">評価対象の会社名・銘柄コードを検索。非上場の場合は財務数値を手動入力。</div>
+      </div>
+      <div class="wb-arrow">→</div>
+      <div class="wb-step">
+        <div class="wb-step-num">Step 2</div>
+        <div class="wb-step-title">ピア企業を選ぶ</div>
+        <div class="wb-step-desc">業種・サブセクターを選択して類似企業をクリック。財務データとマルチプルが自動取得される。</div>
+      </div>
+      <div class="wb-arrow">→</div>
+      <div class="wb-step">
+        <div class="wb-step-num">Step 3</div>
+        <div class="wb-step-title">結果を確認・出力</div>
+        <div class="wb-step-desc">Compsテーブル・Football Fieldチャート・AIコメントが自動生成。CSVエクスポートも可能。</div>
+      </div>
+    </div>
+    <div class="wb-note">
+      <button class="wb-dismiss" onclick="dismissWelcome()">今後表示しない ×</button>
+      💡 <strong>ターゲット企業は上場・非上場どちらも対応。</strong>非上場企業のM&A案件では「非上場企業モード」でIR数値を入力し、上場類似会社のマルチプルと比較できます。財務データはEDINET DB API経由で自動取得（株価は前日終値を取得試行、失敗時は有報期末株価を使用）。
+    </div>
+  </div>
+</div>
+
 <!-- TARGET -->
 <div class="card">
-  <div class="slabel">ターゲット企業</div>
+  <div class="step-header">
+    <span class="step-badge" id="badge1">1</span>
+    <span class="step-label">STEP 1　ターゲット企業</span>
+  </div>
   <div class="mode-toggle">
     <button class="mode-btn active" id="btnListed" onclick="setMode('listed')">上場企業（Tickerで検索）</button>
     <button class="mode-btn" id="btnPrivate" onclick="setMode('private')">非上場企業（手動入力）</button>
@@ -322,8 +423,12 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
 </div>
 
 <!-- PEER -->
+<div class="step-connector visible" id="conn12"></div>
 <div class="card">
-  <div class="slabel">ピア企業の選択</div>
+  <div class="step-header">
+    <span class="step-badge" id="badge2">2</span>
+    <span class="step-label">STEP 2　ピア企業の選択</span>
+  </div>
   <div class="ind-selector">
     <div class="ind-group">
       <label>大分類（セクター）</label>
@@ -357,8 +462,12 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
 </div>
 
 <!-- TABLE -->
+<div class="step-connector" id="conn23"></div>
 <div class="card" id="tableCard" style="display:none">
-  <div class="slabel">Trading Comps テーブル</div>
+  <div class="step-header">
+    <span class="step-badge" id="badge3">3</span>
+    <span class="step-label">STEP 3　Trading Comps テーブル</span>
+  </div>
   <div class="legend-row">
     <div class="legend-item"><span class="badge b-api">API</span>EDINET DB 自動取得</div>
     <div class="legend-item"><span class="badge b-manual">手動</span>ユーザー入力値</div>
@@ -832,9 +941,6 @@ const edinetCache={};   // ticker → edinet_code
 const finCache={};      // edinet_code → raw financials object（速度改善：再取得をスキップ）
 
 // ─── 株価取得（Yahoo Finance プロキシ経由・前日終値）────────
-// ブラウザから直接呼べるCORSプロキシ経由でYahoo Financeを叩く。
-// 失敗時はEDINET有報期末株価へ静かにフォールバック（calcFin内で処理）。
-// fetchWithTimeout: タイムアウト付き fetch
 function fetchWithTimeout(url, ms) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
@@ -848,24 +954,26 @@ async function fetchRealtimePrice(ticker) {
   const proxies = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
     `https://corsproxy.io/?${encodeURIComponent(yahooUrl)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(yahooUrl)}`,
     yahooUrl,
   ];
   for (const proxyUrl of proxies) {
     try {
-      const res = await fetchWithTimeout(proxyUrl, 7000);
-      if (!res.ok) continue;
+      const res = await fetchWithTimeout(proxyUrl, 6000);
+      if (!res.ok) {
+        console.log(`[Valio] プロキシ失敗 HTTP${res.status}: ${proxyUrl.slice(0,60)}`);
+        continue;
+      }
       const data = await res.json();
       const meta = data?.chart?.result?.[0]?.meta;
       if (!meta) continue;
-      // previousClose = 前日終値（市場クローズ後に確定）
       const price = meta.previousClose ?? meta.chartPreviousClose ?? meta.regularMarketPrice;
       if (!price || price <= 0) continue;
-      // 直近取引日の日付
       const ts = meta.regularMarketTime;
       const dateStr = ts
         ? new Date(ts * 1000).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })
         : '—';
-      console.log(`[Valio] 株価取得 ✅ ${symbol} 前日終値 ¥${price} (${dateStr})`);
+      console.log(`[Valio] 株価取得 ✅ ${symbol} = ¥${price} (${dateStr})`);
       return { price, date: dateStr, source: 'Yahoo Finance' };
     } catch (e) {
       console.log(`[Valio] プロキシ失敗 (${e.name}): ${proxyUrl.slice(0,60)}`);
@@ -877,34 +985,75 @@ async function fetchRealtimePrice(ticker) {
 
 
 // 株価 ＋ EDINET財務 → マルチプル再計算
-function applyRealtimePrice(c, price, f){
-  if(!price||!f.shares_issued||price<=0) return c;
-  const mktCap = price * f.shares_issued / 1e6;
-  const ev     = mktCap + c.netDebt;
-  const eps    = f.eps || null;
-  const bps    = f.bps || null;
-  const per    = eps && eps > 0 ? price / eps : null;
-  const pbr    = bps && bps > 0 ? price / bps : null;
-  const evRev  = c.rev   && c.rev   > 0 ? ev / c.rev   : null;
-  const evEb   = c.ebitda && c.ebitda > 0 ? ev / c.ebitda : null;
+// price: 株価（円）, f: raw EDINET financials, overrideMktCap: 直接時価総額入力（百万円）
+function applyRealtimePrice(c, price, f, overrideMktCap){
+  const shares = f
+    ? (f.shares_issued || f.issued_shares || f.total_issued_shares
+       || f.shares_outstanding || f.outstanding_shares || null)
+    : null;
+
+  // mktCap の決定：①直接入力 ②price×shares ③不能
+  let mktCap;
+  if (overrideMktCap && overrideMktCap > 0) {
+    mktCap = overrideMktCap;
+  } else if (price && price > 0 && shares) {
+    mktCap = price * shares / 1e6;
+  } else {
+    // sharesが取れない場合は計算不能 → c をそのまま返す
+    return c;
+  }
+
+  const ev    = mktCap + (c.netDebt || 0);
+  const eps   = f?.eps || null;
+  const bps   = f?.bps || null;
+  const per   = (eps && eps > 0 && price) ? price / eps : null;
+  const pbr   = (bps && bps > 0 && price) ? price / bps : null;
+  const evRev = (c.rev   && c.rev   > 0) ? ev / c.rev   : null;
+  const evEb  = (c.ebitda && c.ebitda > 0) ? ev / c.ebitda : null;
   return { ...c, mktCap, ev, per, pbr, evRev, evEb };
 }
 
 // ─── 手動株価上書き ───────────────────────────────────────
-// ターゲット株価入力フィールドから呼ばれる
 function onPriceInput(){
   if(!tgt||!tgt._rawF) return;
-  const input = document.getElementById('priceInput');
-  const price = parseFloat(input.value);
+  const price = parseFloat(document.getElementById('priceInput').value);
   if(isNaN(price)||price<=0){
     document.getElementById('priceBadge').textContent='入力値が無効';
     return;
   }
+
   const updated = applyRealtimePrice(tgt._rawC, price, tgt._rawF);
   Object.assign(tgt, updated, { manualPrice: price });
-  document.getElementById('priceBadge').textContent=`¥${price.toLocaleString()}`;
-  document.getElementById('priceSource').textContent='手動入力';
-  // KPIを即時更新
+
+  if(tgt.ev == null){
+    // price×sharesでもEVが出ない → 時価総額入力欄を表示
+    showMktCapFallback();
+  } else {
+    document.getElementById('priceBadge').textContent=`¥${price.toLocaleString()}`;
+    document.getElementById('priceSource').textContent='手動入力';
+    updateTgtKpi();
+    calcAll();
+  }
+}
+
+function showMktCapFallback(){
+  const wrap = document.getElementById('mktCapFallbackWrap');
+  if(wrap) wrap.style.display='';
+  const badge = document.getElementById('priceBadge');
+  const src   = document.getElementById('priceSource');
+  if(badge) badge.textContent='株式数データなし';
+  if(src)   src.textContent='時価総額を直接入力してください↓';
+}
+
+function onMktCapInput(){
+  if(!tgt) return;
+  const mktCapM = parseFloat(document.getElementById('mktCapInput').value);
+  if(isNaN(mktCapM)||mktCapM<=0) return;
+  const price = parseFloat(document.getElementById('priceInput').value)||null;
+  const updated = applyRealtimePrice(tgt._rawC, price, tgt._rawF, mktCapM);
+  Object.assign(tgt, updated, { manualMktCap: mktCapM });
+  document.getElementById('priceBadge').textContent=`¥${Math.round(mktCapM).toLocaleString()}M`;
+  document.getElementById('priceSource').textContent='時価総額 手動入力';
   updateTgtKpi();
   calcAll();
 }
@@ -996,20 +1145,43 @@ function fmtCell(code, key, outlierMap) {
   return info.cleaned.toFixed(1) + 'x';
 }
 function calcFin(f){
-  const debt=(f.short_term_loans||0)+(f.current_portion_lt_loans||0)+(f.long_term_loans||0);
-  const cash=f.cash||0,nd=debt-cash;
-  const mktCap=(f.per!=null&&f.eps!=null&&f.shares_issued)?f.per*f.eps*f.shares_issued/1e6:null;
-  const ev=mktCap!=null?mktCap+nd/1e6:null;
-  const rev=f.revenue?f.revenue/1e6:null,op=f.operating_income?f.operating_income/1e6:null;
-  const dep=f.depreciation?f.depreciation/1e6:null;
-  const ebitda=(op!=null&&dep!=null)?op+dep:null,np=f.net_income?f.net_income/1e6:null;
-  const bps=f.bps||null,bv=(bps&&f.shares_issued)?bps*f.shares_issued/1e6:null;
-  const per=f.per||null,pbr=(mktCap&&bv&&bv>0)?mktCap/bv:null;
-  const evRev=(ev&&rev&&rev>0)?ev/rev:null,evEb=(ev&&ebitda&&ebitda>0)?ev/ebitda:null;
-  // eps は applyRealtimePrice で再計算するため raw 値も保持
-  return{mktCap,ev,rev,op,dep,ebitda,np,bv,per,pbr,evRev,evEb,
-    netDebt:nd/1e6,eps:f.eps||null,sharesIssued:f.shares_issued||null,bps_raw:f.bps||null,
-    submitDate:f.submit_date||null,fiscalYear:f.fiscal_year||null};
+  // ── 有利子負債（フィールド名ゆれに対応）─────────────────
+  const debt =
+    (f.ibd_current||0)+(f.ibd_noncurrent||0)           // EDINET DB 標準
+    +(f.short_term_loans||0)+(f.current_portion_lt_loans||0)+(f.long_term_loans||0); // 旧フィールド
+  const cash=f.cash||0, nd=debt-cash;
+
+  // ── 発行済株式数（フィールド名ゆれに対応）────────────────
+  const shares = f.shares_issued || f.issued_shares || f.total_issued_shares
+    || f.shares_outstanding || f.outstanding_shares || null;
+
+  // ── mktCap：per×eps×shares が使えない場合は null ────────
+  // (株価が手動入力されたときは applyRealtimePrice で上書きされる)
+  const mktCap = (f.per!=null && f.eps!=null && shares)
+    ? f.per * f.eps * shares / 1e6 : null;
+
+  const ev     = mktCap!=null ? mktCap + nd/1e6 : null;
+  const rev    = f.revenue         ? f.revenue/1e6         : null;
+  const op     = f.operating_income? f.operating_income/1e6: null;
+  const dep    = f.depreciation    ? f.depreciation/1e6    : null;
+  const ebitda = (op!=null && dep!=null) ? op+dep : (op!=null?op:null);
+  const np     = f.net_income      ? f.net_income/1e6      : null;
+  const bps    = f.bps || null;
+  const bv     = (bps && shares) ? bps*shares/1e6 : null;
+  const per    = f.per || null;
+  const pbr    = (mktCap && bv && bv>0) ? mktCap/bv : null;
+  const evRev  = (ev && rev  && rev >0) ? ev/rev  : null;
+  const evEb   = (ev && ebitda && ebitda>0) ? ev/ebitda : null;
+
+  return {
+    mktCap, ev, rev, op, dep, ebitda, np, bv, per, pbr, evRev, evEb,
+    netDebt: nd/1e6,
+    eps: f.eps||null,
+    sharesIssued: shares,          // 正規化したsharesを保持
+    bps_raw: f.bps||null,
+    submitDate: f.submit_date||null,
+    fiscalYear: f.fiscal_year||null,
+  };
 }
 
 // ─── Sector/subsector ────────────────────────────────────
@@ -1500,41 +1672,52 @@ async function selectTgt(ec,name,sec){
   try{
     const t4 = sec ? sec.replace(/0$/,'') : ec;
 
-    // EDINET財務 ＋ Yahoo Finance を並行取得
+    // EDINET財務 ＋ 株価を並行取得
     const [edinetRes, rtRes] = await Promise.allSettled([
       apiGet('/companies/'+ec),
       fetchRealtimePrice(t4)
     ]);
     if(edinetRes.status==='rejected') throw new Error(edinetRes.reason?.message||'EDINET取得失敗');
 
-    const d   = edinetRes.value;
-    const f   = d.data.latest_financials;
-    finCache[ec] = { f, name: d.data.name_ja||name };
+    const d = edinetRes.value;
+    // latest_financials → financials → {} の順でフォールバック
+    const f = d.data?.latest_financials || d.data?.financials || {};
+    finCache[ec] = { f, name: d.data?.name_ja||name };
 
-    const baseC = calcFin(f);   // EDINETベース
-    const rt    = rtRes.status==='fulfilled' ? rtRes.value : null;
+    // デバッグ：EDINETが返したフィールドをコンソールに出力
+    console.log('[Valio] EDINET財務フィールド:', Object.keys(f).join(', '));
+    console.log('[Valio] shares_issued:', f.shares_issued, '/ eps:', f.eps, '/ per:', f.per);
+
+    const baseC = calcFin(f);
+    const rt = rtRes.status==='fulfilled' ? rtRes.value : null;
     const rtPrice = rt?.price ?? null;
 
-    // 初期株価：リアルタイム取得 → 失敗時は EDINET 期末株価
-    const initPrice = rtPrice ?? (f.per && f.eps ? Math.round(f.per * f.eps) : null);
-    const c = initPrice ? applyRealtimePrice(baseC, initPrice, f) : baseC;
+    // 株価決定：① Yahoo Finance ② EDINET期末（per×eps）③ null
+    const initPrice = rtPrice
+      ?? (f.per && f.eps && f.per > 0 && f.eps > 0 ? Math.round(f.per * f.eps) : null);
+    const c = initPrice ? applyRealtimePrice(baseC, initPrice, f) : { ...baseC };
 
     tgt = {
       code: t4, edinetCode: ec,
-      name: d.data.name_ja||name,
+      name: d.data?.name_ja||name,
       month: f.fiscal_year||'',
-      industry: d.data.industry||'',
+      industry: d.data?.industry||'',
       isPrivate: false,
-      _rawF: f,     // 株価変更時の再計算用
-      _rawC: baseC, // 財務ベースを保持
+      _rawF: f,
+      _rawC: baseC,
       ...c
     };
 
-    // 株価ラベル（ユーザーに何の株価か明示）
     const priceLabel = rtPrice
       ? `前日終値　${rt.date}　※Yahoo Finance経由`
-      : (initPrice ? `有報期末株価　${f.submit_date ? f.submit_date.split(' ')[0] : ''}　※前日終値取得不可` : '株価未取得');
+      : (initPrice ? `有報期末株価　${f.submit_date?f.submit_date.split(' ')[0]:''}　※前日終値取得不可` : '株価未取得 — 下記に手動入力してください');
     const srcLabel = rtPrice ? '前日終値' : (initPrice ? '有報時点' : '未取得');
+
+    // EV未計算かどうかを判定（sharesが取れているかも確認）
+    const shares = f.shares_issued || f.issued_shares || f.total_issued_shares
+      || f.shares_outstanding || f.outstanding_shares || null;
+    const evMissing = tgt.ev == null;
+    const sharesMissing = !shares;
 
     document.getElementById('tgtInfoBox').innerHTML=`<div class="tgt-info">
       <div class="tgt-name">${tgt.name}&nbsp;<span class="badge b-target">TARGET</span>&nbsp;<span class="badge b-api">EDINET DB</span></div>
@@ -1551,7 +1734,7 @@ async function selectTgt(ec,name,sec){
       <div class="price-row">
         <div class="price-label">
           <span class="price-src-badge" id="priceBadge">${srcLabel}</span>
-          <span id="priceSource" style="font-size:10.5px;color:var(--text3);margin-left:4px">${priceLabel}</span>
+          <span id="priceSource" style="font-size:10.5px;color:var(--teal);opacity:.75;margin-left:4px">${priceLabel}</span>
         </div>
         <div class="price-input-wrap">
           <span style="font-size:12px;color:var(--text2)">株価（円）</span>
@@ -1563,10 +1746,28 @@ async function selectTgt(ec,name,sec){
           <button class="price-refresh-btn" onclick="refreshPrice('${t4}')" title="最新株価を再取得">↺ 再取得</button>
         </div>
       </div>
+      <div id="mktCapFallbackWrap" style="display:${evMissing?'':'none'};margin-top:8px;padding:8px 0 2px;border-top:.5px solid rgba(255,255,255,.2)">
+        <div style="font-size:11px;color:var(--teal);margin-bottom:6px">
+          ${sharesMissing
+            ? '⚠️ 発行済株式数がEDINETから取得できませんでした。'
+            : '⚠️ EV・時価総額を自動計算できませんでした。'}
+          IRページ等で確認した<strong>時価総額（百万円）</strong>を入力すると計算されます。
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--text2)">時価総額（百万円）</span>
+          <input class="price-input" id="mktCapInput" type="number" min="1" step="1"
+            placeholder="例：5200"
+            oninput="onMktCapInput()"
+            title="時価総額（百万円単位）を直接入力">
+        </div>
+      </div>
     </div>`;
     saveRecent(tgt);
     calcAll();
-  }catch(e){document.getElementById('tgtInfoBox').innerHTML='<div class="info-note">エラー：'+e.message+'</div>';}
+  }catch(e){
+    document.getElementById('tgtInfoBox').innerHTML='<div class="info-note">エラー：'+e.message+'</div>';
+    console.error('[Valio] selectTgt error:', e);
+  }
 }
 
 // 株価再取得ボタン
@@ -1611,6 +1812,7 @@ function calcAll(){
   document.getElementById('dlomV').textContent=document.getElementById('dlom').value+'%';
   document.getElementById('sizePV').textContent=document.getElementById('sizeP').value+'%';
   document.getElementById('ctrlV').textContent=document.getElementById('ctrl').value+'%';
+  updateStepBadges();
   const t=mode==='listed'?tgt:getPrivateTgt();
   if(!t||!peers.length){hideAll();return;}
 
@@ -2169,6 +2371,45 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='Valio_Comps_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
+// ─── Welcome Banner ──────────────────────────────────────
+function toggleWelcome(){
+  const body=document.getElementById('wbBody');
+  const lbl=document.getElementById('wbToggleLabel');
+  const open=body.classList.toggle('open');
+  lbl.textContent=open?'▲ 閉じる':'▼ 開く';
+}
+function dismissWelcome(){
+  try{localStorage.setItem('valio_wb_dismissed','1');}catch(e){}
+  document.getElementById('welcomeBanner').style.display='none';
+}
+(function initWelcome(){
+  try{
+    if(localStorage.getItem('valio_wb_dismissed')==='1'){
+      document.getElementById('welcomeBanner').style.display='none';
+      return;
+    }
+  }catch(e){}
+  // 初回訪問時は自動で開く
+  document.getElementById('wbBody').classList.add('open');
+  document.getElementById('wbToggleLabel').textContent='▲ 閉じる';
+})();
+
+// ─── Step Badge 完了状態の更新 ────────────────────────────
+function updateStepBadges(){
+  const step1done = !!(mode==='listed' ? tgt : (document.getElementById('pName')?.value||'').trim());
+  const step2done = peers.length > 0;
+
+  const b1=document.getElementById('badge1');
+  const b2=document.getElementById('badge2');
+  const b3=document.getElementById('badge3');
+  const c23=document.getElementById('conn23');
+
+  if(b1) b1.className='step-badge'+(step1done?' done':'');
+  if(b2) b2.className='step-badge'+(step2done?' done':'');
+  if(b3) b3.className='step-badge'+(step1done&&step2done?' done':'');
+  if(c23) c23.className='step-connector'+(step2done?' visible':'');
+}
+
 renderRecent();
 </script>
 </body>
