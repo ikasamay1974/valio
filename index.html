@@ -673,17 +673,16 @@ function loadRecent(code){
   const list = getRecent();
   const r = list.find(x=>x.code===code);
   if(!r) return;
-  // tgt オブジェクトとして復元
   tgt = {
     ...r, isPrivate: false,
-    _rawF: null, _rawC: null  // 株価再取得は再取得ボタンで
+    _rawF: null, _rawC: null  // 再取得ボタンで最新化
   };
   document.getElementById('tgtQ').value = r.name;
 
-  // KPI表示（価格情報なし）
+  const evMissing = tgt.ev == null;
   const priceNote = r.submitDate
-    ? `📅 キャッシュから復元（有報 ${r.submitDate}）　↺ 再取得ボタンで最新化できます`
-    : '📅 キャッシュから復元';
+    ? `キャッシュから復元（有報 ${r.submitDate}）　↺ 再取得ボタンで最新化`
+    : 'キャッシュから復元';
 
   document.getElementById('tgtInfoBox').innerHTML=`<div class="tgt-info">
     <div class="tgt-name">${tgt.name}&nbsp;<span class="badge b-target">TARGET</span>&nbsp;<span class="badge b-api">キャッシュ</span></div>
@@ -700,7 +699,7 @@ function loadRecent(code){
     <div class="price-row">
       <div class="price-label">
         <span class="price-src-badge" id="priceBadge">キャッシュ</span>
-        <span id="priceSource" style="font-size:10.5px;color:var(--text3);margin-left:4px">${priceNote}</span>
+        <span id="priceSource" style="font-size:10.5px;color:var(--teal);opacity:.75;margin-left:4px">${priceNote}</span>
       </div>
       <div class="price-input-wrap">
         <span style="font-size:12px;color:var(--text2)">株価（円）</span>
@@ -709,6 +708,19 @@ function loadRecent(code){
           oninput="onPriceInput()"
           title="株価を入力するとマルチプルが再計算されます">
         <button class="price-refresh-btn" onclick="refreshPrice('${r.code}')" title="最新株価を再取得">↺ 再取得</button>
+      </div>
+    </div>
+    <div id="mktCapFallbackWrap" style="display:${evMissing?'block':'none'};margin-top:8px;padding:8px 0 2px;border-top:.5px solid rgba(255,255,255,.2)">
+      <div style="font-size:11px;color:var(--teal);margin-bottom:6px">
+        ⚠️ EV・時価総額を自動計算できませんでした（発行済株式数または株価未取得）。<br>
+        IRページ等で確認した<strong>時価総額（百万円）</strong>を入力してください。
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--text2)">時価総額（百万円）</span>
+        <input class="price-input" id="mktCapInput" type="number" min="1" step="1"
+          placeholder="例：5200"
+          oninput="onMktCapInput()"
+          title="時価総額（百万円単位）を直接入力">
       </div>
     </div>
   </div>`;
@@ -1015,30 +1027,49 @@ function applyRealtimePrice(c, price, f, overrideMktCap){
 
 // ─── 手動株価上書き ───────────────────────────────────────
 function onPriceInput(){
-  if(!tgt||!tgt._rawF) return;
+  if(!tgt) return;
   const price = parseFloat(document.getElementById('priceInput').value);
   if(isNaN(price)||price<=0){
     document.getElementById('priceBadge').textContent='入力値が無効';
     return;
   }
 
-  const updated = applyRealtimePrice(tgt._rawC, price, tgt._rawF);
-  Object.assign(tgt, updated, { manualPrice: price });
+  // _rawF がある（新規取得）場合は applyRealtimePrice を使う
+  if(tgt._rawF && tgt._rawC){
+    const updated = applyRealtimePrice(tgt._rawC, price, tgt._rawF);
+    Object.assign(tgt, updated, {manualPrice: price});
+  } else {
+    // キャッシュ復元の場合：tgt に直接格納された値を使って再計算
+    const shares = tgt.sharesIssued || null;
+    if(shares && shares > 0){
+      const mktCap = price * shares / 1e6;
+      const ev     = mktCap + (tgt.netDebt || 0);
+      const per    = tgt.eps  && tgt.eps  > 0 ? price / tgt.eps  : null;
+      const pbr    = tgt.bps_raw && tgt.bps_raw > 0 ? price / tgt.bps_raw : null;
+      const evRev  = tgt.rev    && tgt.rev    > 0 ? ev / tgt.rev    : null;
+      const evEb   = tgt.ebitda && tgt.ebitda > 0 ? ev / tgt.ebitda : null;
+      Object.assign(tgt, {mktCap, ev, per, pbr, evRev, evEb, manualPrice: price});
+    } else {
+      // sharesも不明 → 時価総額入力欄を表示
+      showMktCapFallback();
+      return;
+    }
+  }
 
   if(tgt.ev == null){
-    // price×sharesでもEVが出ない → 時価総額入力欄を表示
     showMktCapFallback();
-  } else {
-    document.getElementById('priceBadge').textContent=`¥${price.toLocaleString()}`;
-    document.getElementById('priceSource').textContent='手動入力';
-    updateTgtKpi();
-    calcAll();
+    return;
   }
+
+  document.getElementById('priceBadge').textContent=`¥${price.toLocaleString()}`;
+  document.getElementById('priceSource').textContent='手動入力';
+  updateTgtKpi();
+  calcAll();
 }
 
 function showMktCapFallback(){
   const wrap = document.getElementById('mktCapFallbackWrap');
-  if(wrap) wrap.style.display='';
+  if(wrap) wrap.style.display='block';
   const badge = document.getElementById('priceBadge');
   const src   = document.getElementById('priceSource');
   if(badge) badge.textContent='株式数データなし';
@@ -1049,11 +1080,24 @@ function onMktCapInput(){
   if(!tgt) return;
   const mktCapM = parseFloat(document.getElementById('mktCapInput').value);
   if(isNaN(mktCapM)||mktCapM<=0) return;
-  const price = parseFloat(document.getElementById('priceInput').value)||null;
-  const updated = applyRealtimePrice(tgt._rawC, price, tgt._rawF, mktCapM);
-  Object.assign(tgt, updated, { manualMktCap: mktCapM });
-  document.getElementById('priceBadge').textContent=`¥${Math.round(mktCapM).toLocaleString()}M`;
-  document.getElementById('priceSource').textContent='時価総額 手動入力';
+
+  // _rawC がある場合はそれをベースに、なければ tgt を直接更新
+  const base = tgt._rawC || tgt;
+  const ev   = mktCapM + (base.netDebt || tgt.netDebt || 0);
+  const evRev = (tgt.rev    && tgt.rev    > 0) ? ev / tgt.rev    : null;
+  const evEb  = (tgt.ebitda && tgt.ebitda > 0) ? ev / tgt.ebitda : null;
+
+  // 株価も入力されていれば per/pbr も更新
+  const price = parseFloat(document.getElementById('priceInput')?.value)||null;
+  const per = (price && tgt.eps  && tgt.eps  > 0) ? price / tgt.eps  : tgt.per;
+  const pbr = (price && tgt.bps_raw && tgt.bps_raw > 0) ? price / tgt.bps_raw : tgt.pbr;
+
+  Object.assign(tgt, {mktCap: mktCapM, ev, evRev, evEb, per, pbr, manualMktCap: mktCapM});
+
+  const badge = document.getElementById('priceBadge');
+  const src   = document.getElementById('priceSource');
+  if(badge) badge.textContent=`¥${Math.round(mktCapM).toLocaleString()}M`;
+  if(src)   src.textContent='時価総額 手動入力';
   updateTgtKpi();
   calcAll();
 }
