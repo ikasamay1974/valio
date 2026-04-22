@@ -4,14 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Valio — M&A バリュエーション</title>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZV96L0X4LP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZV96L0X4LP');
-</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -348,15 +340,152 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
   border-top:.5px solid var(--border);
   margin-top:8px;padding-top:8px;line-height:1.6;
 }
+
+/* ── DCF Tab ─────────────────────────────────────────── */
+.tab-nav{display:flex;gap:4px;margin-bottom:12px}
+.tab-btn{padding:7px 18px;font-size:13px;border-radius:20px;border:.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-weight:500;transition:all .15s}
+.tab-btn.active{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal);font-weight:700}
+.tab-btn .eq-badge{font-size:11px;font-family:var(--mono);margin-left:6px;opacity:.8}
+
+/* DCF layout */
+#tab-dcf{display:none}
+.dcf-layout{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:600px;background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.dcf-sidebar{background:var(--bg2);border-right:.5px solid var(--border);display:flex;flex-direction:column}
+.dcf-sidebar-logo{padding:12px 14px 8px;border-bottom:.5px solid var(--border);font-size:13px;font-weight:700;color:var(--teal)}
+.dcf-nav-section{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px 3px}
+.dcf-nav-item{display:flex;align-items:center;gap:7px;padding:8px 14px;cursor:pointer;font-size:12px;color:var(--text2);border-right:2px solid transparent;transition:all .12s}
+.dcf-nav-item:hover{background:var(--bg3)}
+.dcf-nav-item.active{background:var(--teal-l);color:var(--teal);font-weight:700;border-right-color:var(--teal)}
+.dcf-nav-item .done-mark{font-size:10px;color:var(--teal-m);margin-left:auto}
+.dcf-eq-box{margin:10px;padding:10px;background:var(--teal-l);border:.5px solid var(--teal-m);border-radius:8px}
+.dcf-eq-label{font-size:9px;font-weight:700;color:var(--teal);letter-spacing:.06em;margin-bottom:3px}
+.dcf-eq-val{font-size:18px;font-weight:800;color:var(--teal);font-family:var(--mono)}
+.dcf-eq-sub{font-size:10px;color:var(--text2);margin-top:2px}
+.dcf-main{overflow-y:auto;padding:20px 22px}
+
+/* DCF Cards */
+.dc{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.dc-accent{border-left:3px solid var(--teal)}
+.dc-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.dc-sec{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.dc-desc{font-size:12px;color:var(--text2);margin-bottom:14px}
+.dc-info{background:var(--teal-l);border:.5px solid var(--teal-m);border-radius:var(--r);padding:7px 11px;font-size:12px;color:var(--teal);margin-bottom:10px}
+.dc-warn{background:var(--amber-l);border:.5px solid rgba(99,56,6,.3);border-radius:var(--r);padding:7px 11px;font-size:12px;color:var(--amber-d);margin-top:8px}
+.dc-auto{font-size:8px;background:var(--teal);color:#fff;border-radius:3px;padding:1px 4px;font-weight:700;margin-left:4px;vertical-align:middle}
+.dc-src{font-size:8px;background:#5B4FCF;color:#fff;border-radius:3px;padding:1px 4px;font-weight:700;margin-left:4px;vertical-align:middle}
+
+/* DCF inputs */
+.dc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.dc-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.dc-grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.dc-fld label{display:block;font-size:11px;color:var(--text2);margin-bottom:4px}
+.dc-fld input[type=number],.dc-fld select{width:100%;font-size:13px;border:.5px solid var(--border2);border-radius:var(--r);padding:6px 9px;background:var(--bg);color:var(--text);outline:none}
+.dc-fld input.auto{background:var(--teal-l);border-color:var(--teal-m)}
+.dc-fld input:focus,.dc-fld select:focus{border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.dc-suffix{font-size:11px;color:var(--text3);margin-left:4px}
+.dc-input-row{display:flex;align-items:center;gap:4px}
+
+/* DCF table */
+.dc-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.dc-tbl th{padding:6px 9px;background:var(--bg2);border:.5px solid var(--border);text-align:left;font-size:11px;color:var(--text2);font-weight:600;white-space:nowrap}
+.dc-tbl th.r{text-align:right}
+.dc-tbl td{padding:5px 9px;border:.5px solid var(--border);font-size:12px;white-space:nowrap}
+.dc-tbl td.r{text-align:right;font-family:var(--mono)}
+.dc-tbl tr.hi{background:var(--teal-l)}
+.dc-tbl tr.hi td{color:var(--teal);font-weight:700}
+
+/* DCF buttons */
+.dc-nav-row{display:flex;justify-content:space-between;margin-top:14px;gap:8px}
+.dc-btn{padding:8px 18px;border-radius:var(--r);border:none;font-size:13px;font-weight:600;cursor:pointer}
+.dc-btn.primary{background:var(--teal);color:#fff}
+.dc-btn.secondary{background:var(--bg2);color:var(--text2)}
+.dc-btn.seed{background:var(--teal);color:#fff;width:100%;padding:12px;font-size:14px}
+
+/* Pill toggle */
+.dc-pills{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.dc-pill{padding:4px 12px;font-size:12px;border-radius:20px;cursor:pointer;border:.5px solid var(--border2);background:transparent;color:var(--text2)}
+.dc-pill.on{border-color:var(--teal-m);background:var(--teal-l);color:var(--teal);font-weight:600}
+
+/* Regression boxes */
+.dc-reg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.dc-reg-box{background:var(--teal-l);border:.5px solid var(--teal-m);border-radius:8px;padding:10px;text-align:center}
+.dc-reg-box.warn{background:var(--amber-l);border-color:rgba(99,56,6,.3)}
+.dc-reg-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.dc-reg-val{font-size:18px;font-weight:800;color:var(--teal)}
+.dc-reg-box.warn .dc-reg-val{color:var(--amber-d)}
+
+/* Football chart */
+.dc-football{position:relative;padding-left:110px;padding-right:8px}
+.dc-fb-axis{display:flex;justify-content:space-between;margin-bottom:3px}
+.dc-fb-axis-val{font-size:10px;color:var(--text3);text-align:center;min-width:30px}
+.dc-fb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dc-fb-label{width:110px;text-align:right;padding-right:6px;flex-shrink:0}
+.dc-fb-name{font-size:11px;color:var(--text2)}
+.dc-fb-name.base{font-weight:700;color:var(--teal)}
+.dc-fb-sub{font-size:10px;color:var(--text3)}
+.dc-fb-track{flex:1;position:relative;height:26px;background:var(--bg2);border-radius:4px}
+.dc-fb-track.base{height:32px}
+.dc-fb-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;border:2px solid #fff;z-index:2}
+.dc-fb-dot.base{width:14px;height:14px}
+.dc-fb-val{position:absolute;font-size:10px;font-weight:600;background:rgba(255,255,255,.92);padding:0 4px;border-radius:2px;white-space:nowrap;top:50%;transform:translateY(-50%)}
+.dc-fb-range{position:absolute;top:6px;bottom:6px;border-radius:3px;opacity:.38}
+.dc-fb-tick{position:absolute;top:15%;bottom:15%;width:2px;opacity:.6}
+.dc-fb-sep{font-size:10px;font-weight:700;color:var(--text3);padding:2px 0 2px 110px;letter-spacing:.06em;margin-top:6px;margin-bottom:2px}
+.dc-fb-overlap{position:relative;height:18px;border-radius:4px;border:.5px dashed var(--teal-m);margin-left:110px;margin-top:8px}
+.dc-fb-overlap-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:var(--teal);white-space:nowrap;background:var(--teal-l);padding:0 6px;border-radius:3px}
+
+/* Slider */
+.dc-slider-row{background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.dc-slider-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.dc-slider-label{font-size:11px;color:var(--text2)}
+.dc-slider-val{font-size:13px;font-weight:700}
+.dc-slider-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px}
+input[type=range].dc-range{width:100%;height:4px}
+
+/* Hero banner */
+.dc-hero{background:linear-gradient(135deg,#1A2E28,#2D4A3E);border-radius:var(--rl);padding:18px 20px;margin-bottom:12px;color:#fff}
+.dc-hero-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;color:#A8C4BC;margin-bottom:8px;text-transform:uppercase}
+.dc-hero-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dc-hero-scen{text-align:center}
+.dc-hero-name{font-size:10px;color:#A8C4BC;margin-bottom:2px}
+.dc-hero-base-val{font-size:34px;font-weight:800;color:#fff;font-family:var(--mono)}
+.dc-hero-side-val{font-size:18px;font-weight:700;font-family:var(--mono)}
+.dc-hero-sub{font-size:10px;color:#8AADA4;margin-top:2px}
+.dc-hero-arrow{font-size:20px;color:#4A7A6A}
+
+/* Summary boxes */
+.dc-sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.dc-sum-box{background:var(--bg2);border:.5px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.dc-sum-box.hi{background:var(--teal-l);border-color:var(--teal-m)}
+.dc-sum-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.dc-sum-val{font-size:16px;font-weight:700;color:var(--text);font-family:var(--mono)}
+.dc-sum-box.hi .dc-sum-val{color:var(--teal)}
+
+/* Tabs within result page */
+.dc-subtabs{display:flex;border-bottom:.5px solid var(--border);margin-bottom:12px}
+.dc-subtab{padding:6px 14px;font-size:12px;font-weight:400;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent}
+.dc-subtab.on{font-weight:700;color:var(--teal);border-bottom-color:var(--teal)}
+
+/* Sens table */
+.dc-sens td,.dc-sens th{padding:5px 8px;border:.5px solid var(--border);font-size:11px;font-family:var(--mono)}
+.dc-sens th{background:var(--bg2);color:var(--text2);font-weight:600;text-align:center}
+.dc-sens td{text-align:right}
+.dc-sens td.base-cell{background:var(--teal-l);color:var(--teal);font-weight:700}
+
 </style>
 </head>
 <body>
 <div class="container">
 
 <div class="app-header">
-  <div><h1>Valio</h1><div class="sub">M&A バリュエーション — Trading Comps　|　EDINET DB API リアルタイム連携</div></div>
+  <div><h1>Valio</h1><div class="sub">M&A バリュエーション　|　EDINET DB API リアルタイム連携</div></div>
   <span class="ver">v1.0 β</span>
 </div>
+<div class="tab-nav">
+  <button class="tab-btn active" id="tabBtnComps" onclick="switchTab('comps')">📊 Trading Comps</button>
+  <button class="tab-btn" id="tabBtnDcf" onclick="switchTab('dcf')">📐 DCF <span class="eq-badge" id="tabEqBadge"></span></button>
+</div>
+<div id="tab-comps">
 
 <!-- Welcome Banner -->
 <div class="welcome-banner" id="welcomeBanner">
@@ -545,7 +674,26 @@ footer{text-align:center;font-size:10.5px;color:var(--text3);margin-top:18px;pad
     <button class="btn" onclick="exportCSV()">CSVエクスポート</button>
     <button class="btn" onclick="window.print()">印刷</button>
   </div>
+</div><!-- /tab-comps -->
+
+<div id="tab-dcf">
+  <div class="dcf-layout">
+    <!-- Sidebar -->
+    <div class="dcf-sidebar">
+      <div class="dcf-sidebar-logo">Valio <span style="font-size:10px;background:var(--teal-l);color:var(--teal);border-radius:4px;padding:1px 6px;font-weight:700;margin-left:4px">DCF</span></div>
+      <div id="dcfNav"></div>
+      <div class="dcf-eq-box">
+        <div class="dcf-eq-label">EQUITY VALUE</div>
+        <div class="dcf-eq-val" id="sidebarEQ">—</div>
+        <div class="dcf-eq-sub">EV: <span id="sidebarEV">—</span></div>
+      </div>
+    </div>
+    <!-- Main -->
+    <div class="dcf-main" id="dcfMain"></div>
+  </div>
 </div>
+
+
 
 <footer>Valio v1.0 β — M&A バリュエーション　|　データ：EDINET DB API（金融庁EDINET）　|　2026年4月</footer>
 
@@ -2466,3 +2614,893 @@ renderRecent();
 </script>
 </body>
 </html>
+
+<!-- ════════════════════════════════════════════════════
+     VALIO DCF — Full Implementation
+     State: window.DCF
+     Comps linkage: window.__valioComps
+════════════════════════════════════════════════════ -->
+<script>
+// ── Tab switcher ─────────────────────────────────────────────
+function switchTab(t){
+  document.getElementById('tab-comps').style.display = t==='comps'?'':'none';
+  document.getElementById('tab-dcf').style.display   = t==='dcf'?'':'none';
+  document.getElementById('tabBtnComps').className = 'tab-btn'+(t==='comps'?' active':'');
+  document.getElementById('tabBtnDcf').className   = 'tab-btn'+(t==='dcf'?' active':'');
+  if(t==='dcf') DCF.init();
+}
+
+// ── DCF State ────────────────────────────────────────────────
+const DCF = {
+  page: 'upload',
+  seeded: false,
+  CY: new Date().getFullYear(),
+
+  // Historical (3yr)
+  hist: [
+    {rev:280,cogs:151,sga:96, da:16,capex:18,ar:60,inv:50,ap:35,ibd:130,equity:160},
+    {rev:340,cogs:177,sga:104,da:17,capex:20,ar:72,inv:58,ap:40,ibd:115,equity:195},
+    {rev:420,cogs:210,sga:114,da:19,capex:22,ar:88,inv:66,ap:47,ibd:100,equity:240},
+  ],
+
+  // Segments
+  segments: [
+    {id:1,name:'主力事業',mode:'direct',baseRev:420,g:[12,10,8,7,6],gpMargin:50},
+  ],
+
+  // Cost
+  varSGA:10, fixSGA:72, fixSGAG:2.4, otherInc:0, taxRate:30, taxLoss:true,
+  projYears:5,
+
+  // D&A assets
+  exAssets:[{id:1,name:'既存資産',nbv:200,annDep:19,remYrs:5}],
+  newCapex:[{id:1,name:'設備増強',year:2,cost:20,depRate:20}],
+
+  // WC (CCC)
+  dso:75, dio:90, dpo:60, wcBase:0,
+
+  // WACC
+  wacc:12, useBuildup:false, rf:1.5, erp:5.5, sp:3.5, sr:2.0,
+  actualIBD:100, actualEQ:240, kd:2.5,
+
+  // TV
+  tvMethod:'perpetual', tgRate:2.0, tvMult:7,
+
+  // Net debt bridge
+  cash:40, ibdC:20, ibdNC:80,
+
+  // Scenario sliders
+  bearWaccAdj:2.0, bullWaccAdj:2.0, bearTgAdj:0.5, bullTgAdj:0.5,
+
+  // Comps multiples (from Trading Comps or manual)
+  compsEBITDA:{lo:6.5,med:8.0,hi:10.0,ebitda:null},
+  compsPER:{lo:12,med:16,hi:20,earnings:null},
+  compsPBR:{lo:1.2,med:1.8,hi:2.5,bv:null},
+
+  // Regression result (computed)
+  reg: null,
+
+  // ── Formatters ──────────────────────────────────────────
+  fm(n){
+    if(n==null||isNaN(n)||!isFinite(n))return'—';
+    return Math.abs(n)>=1000?`¥${(n/1000).toFixed(1)}B`:`¥${Math.round(n).toLocaleString()}M`;
+  },
+  pc(n){return(!isFinite(n)||isNaN(n)||n==null)?'—':`${(n*100).toFixed(1)}%`;},
+  gf(n){return(!isFinite(n)||isNaN(n))?'—':(n>=0?`+${(n*100).toFixed(1)}%`:`${(n*100).toFixed(1)}%`);},
+
+  // ── Regression (SGA → fixed + variable) ─────────────────
+  computeReg(){
+    const h=this.hist, n=h.length;
+    const sx=h.reduce((s,x)=>s+x.rev,0), sy=h.reduce((s,x)=>s+x.sga,0);
+    const sxy=h.reduce((s,x)=>s+x.rev*x.sga,0), sx2=h.reduce((s,x)=>s+x.rev**2,0);
+    const den=n*sx2-sx**2;
+    let varR=0,fixF=0;
+    if(Math.abs(den)>0.001){varR=Math.max(0,(n*sxy-sx*sy)/den)*100;fixF=Math.max(0,(sy-varR/100*sx)/n);}
+    else fixF=sy/n;
+    const sMean=sy/n;
+    const ssTot=h.reduce((s,x)=>s+(x.sga-sMean)**2,0);
+    const ssRes=h.reduce((s,x)=>s+(x.sga-(fixF+varR/100*x.rev))**2,0);
+    const r2=ssTot>0?Math.max(0,1-ssRes/ssTot):1;
+    const last=h[n-1], first=h[0];
+    const cagr=Math.pow(last.rev/first.rev,1/(n-1))-1;
+    const gpM=h.reduce((s,x)=>s+(x.rev-x.cogs)/x.rev,0)/n*100;
+    const avgDSO=h.reduce((s,x)=>s+x.ar/x.rev*365,0)/n;
+    const avgDIO=h.reduce((s,x)=>s+x.inv/x.cogs*365,0)/n;
+    const avgDPO=h.reduce((s,x)=>s+x.ap/x.cogs*365,0)/n;
+    const avgCapex=h.reduce((s,x)=>s+x.capex,0)/n;
+    const tg=Math.min(cagr*0.25,0.02);
+    const projG=Array.from({length:5},(_,i)=>{const d=Math.pow(0.82,i);return parseFloat((cagr*d+tg*(1-d)).toFixed(4));});
+    this.reg={varR:parseFloat(varR.toFixed(2)),fixF:parseFloat(fixF.toFixed(1)),r2,cagr,gpM,avgDSO,avgDIO,avgDPO,avgCapex,tg,projG,lastDA:last.da,lastIBD:last.ibd,lastEquity:last.equity};
+  },
+
+  // ── Auto-seed from historical ────────────────────────────
+  runSeed(){
+    this.computeReg();
+    const r=this.reg, g=r.projG.slice(0,this.projYears).map(v=>parseFloat((v*100).toFixed(1)));
+    this.segments[0].g=g;
+    this.segments[0].gpMargin=parseFloat(r.gpM.toFixed(1));
+    this.varSGA=r.varR; this.fixSGA=r.fixF;
+    this.dso=Math.round(r.avgDSO); this.dio=Math.round(r.avgDIO); this.dpo=Math.round(r.avgDPO);
+    this.exAssets[0].annDep=r.lastDA;
+    this.newCapex[0].cost=Math.round(r.avgCapex);
+    this.actualIBD=r.lastIBD; this.actualEQ=r.lastEquity;
+    // Pull from Trading Comps if available
+    this.pullCompsData();
+    this.seeded=true;
+    this.navigate('revenue');
+  },
+
+  // ── Pull Trading Comps data ──────────────────────────────
+  pullCompsData(){
+    const c=window.__valioComps;
+    if(!c)return;
+    if(c.ebitda!=null) this.compsEBITDA.ebitda=c.ebitda;
+    if(c.netIncome!=null) this.compsPER.earnings=c.netIncome;
+    if(c.bv!=null) this.compsPBR.bv=c.bv;
+    if(c.evEbitdaLo!=null){this.compsEBITDA.lo=c.evEbitdaLo;this.compsEBITDA.med=c.evEbitdaMed;this.compsEBITDA.hi=c.evEbitdaHi;}
+    if(c.perLo!=null){this.compsPER.lo=c.perLo;this.compsPER.med=c.perMed;this.compsPER.hi=c.perHi;}
+    if(c.pbrLo!=null){this.compsPBR.lo=c.pbrLo;this.compsPBR.med=c.pbrMed;this.compsPBR.hi=c.pbrHi;}
+  },
+
+  // ── FCF Calculations ─────────────────────────────────────
+  calcFCF(){
+    const PY=this.projYears, wacc=this.wacc/100;
+    let cumLoss=0;
+    const baseRev=this.hist[this.hist.length-1].rev;
+    return Array.from({length:PY},(_,yi)=>{
+      let rev=0;
+      this.segments.forEach(seg=>{
+        if(seg.mode==='unit'){
+          const pr=(seg.unitPrice||0)*Math.pow(1+(seg.priceG||0)/100,yi+1);
+          const qt=(seg.qty||0)*Math.pow(1+(seg.qtyG||0)/100,yi+1);
+          rev+=(pr*qt)/1e6;
+        }else{
+          let r=seg.baseRev||0;
+          const gs=seg.g||[];
+          for(let i=0;i<yi+1;i++) r*=(1+(gs[i]||0)/100);
+          rev+=r;
+        }
+      });
+      const cogs=rev*(1-this.segments.reduce((s,sg,si)=>{
+        // weighted avg GP margin
+        let segRev=0;
+        if(sg.mode==='unit'){const pr=(sg.unitPrice||0)*Math.pow(1+(sg.priceG||0)/100,yi+1);const qt=(sg.qty||0)*Math.pow(1+(sg.qtyG||0)/100,yi+1);segRev=(pr*qt)/1e6;}
+        else{let r=sg.baseRev||0;const gs=sg.g||[];for(let i=0;i<yi+1;i++)r*=(1+(gs[i]||0)/100);segRev=r;}
+        return s+segRev*(sg.gpMargin||0)/100;
+      },0)/Math.max(rev,0.001));
+      const gp=rev-cogs;
+      const varS=rev*this.varSGA/100;
+      const fixS=this.fixSGA*Math.pow(1+this.fixSGAG/100,yi+1);
+      const ebitda=gp-varS-fixS;
+      // D&A
+      let da=this.exAssets.reduce((s,a)=>s+(yi<(a.remYrs||0)?(a.annDep||0):0),0);
+      this.newCapex.forEach(c=>{if(yi>=(c.year-1))da+=(c.cost||0)*(c.depRate||20)/100;});
+      const capex=this.newCapex.filter(c=>c.year===yi+1).reduce((s,c)=>s+(c.cost||0),0);
+      const ebit=ebitda-da+this.otherInc;
+      let tax=0;
+      if(this.taxLoss){
+        if(ebit<0){cumLoss+=Math.abs(ebit);tax=0;}
+        else if(cumLoss>0){const off=Math.min(cumLoss,ebit);tax=(ebit-off)*this.taxRate/100;cumLoss-=off;}
+        else tax=ebit*this.taxRate/100;
+      }else tax=Math.max(0,ebit*this.taxRate/100);
+      const nopat=ebit-tax;
+      // ΔWC (CCC)
+      const prevRev=yi===0?baseRev:(()=>{let r=baseRev;const gs=this.segments[0].g||[];for(let i=0;i<yi;i++)r*=(1+(gs[i]||0)/100);return r;})();
+      const prevCogs=prevRev*(1-(this.segments[0].gpMargin||50)/100);
+      const ar=rev*this.dso/365, inv=cogs*this.dio/365, ap=cogs*this.dpo/365;
+      const pAR=prevRev*this.dso/365, pInv=prevCogs*this.dio/365, pAP=prevCogs*this.dpo/365;
+      const nwc=ar+inv-ap, prevNWC=yi===0?(this.wcBase||0):(pAR+pInv-pAP);
+      const delta=nwc-prevNWC;
+      const fcf=nopat+da-capex-delta;
+      const pv=fcf/Math.pow(1+wacc,yi+1);
+      return{rev,gp,cogs,ebitda,da,ebit,tax,nopat,capex,delta,fcf,pv,nwc};
+    });
+  },
+
+  calcEV(waccOv,tgOv){
+    const fcfs=this.calcFCF();
+    const w=(waccOv!=null?waccOv:this.wacc)/100;
+    const t=(tgOv!=null?tgOv:this.tgRate)/100;
+    const pvF=fcfs.reduce((s,r,i)=>s+r.fcf/Math.pow(1+w,i+1),0);
+    const last=fcfs[fcfs.length-1]||{};
+    let tv=NaN;
+    if(this.tvMethod==='perpetual'){if(w>t)tv=(last.fcf||0)*(1+t)/(w-t);}
+    else tv=(last.ebitda||0)*this.tvMult;
+    const pvTV=isFinite(tv)?tv/Math.pow(1+w,this.projYears):NaN;
+    return{ev:pvF+pvTV,pvF,pvTV,fcfs,last};
+  },
+
+  getEquity(wAdj=0,tAdj=0){
+    const {ev}=this.calcEV(this.wacc+wAdj,this.tgRate+tAdj);
+    return ev-(this.ibdC+this.ibdNC-this.cash);
+  },
+
+  // ── Navigation ───────────────────────────────────────────
+  NAV:[
+    {id:'upload', label:'書類アップロード', icon:'📎', group:'準備'},
+    {id:'history',label:'過去実績入力',     icon:'📊', group:null},
+    {id:'seed',   label:'自動推計',         icon:'✦',  group:null},
+    {id:'revenue',label:'売上・GPマージン', icon:'💹', group:'予測パラメータ'},
+    {id:'cost',   label:'費用構造',         icon:'📋', group:null},
+    {id:'capex',  label:'設備投資・D&A',   icon:'🏭', group:null},
+    {id:'wc',     label:'運転資本（CCC）', icon:'🔄', group:null},
+    {id:'wacc',   label:'WACC・資本構成',  icon:'📐', group:null},
+    {id:'tv',     label:'残存価値',        icon:'🏁', group:null},
+    {id:'result', label:'計算結果',        icon:'💰', group:'結果'},
+  ],
+
+  navigate(id){
+    this.page=id;
+    this.renderNav();
+    this.renderPage();
+    this.updateSidebar();
+  },
+
+  renderNav(){
+    const cur=this.NAV.findIndex(n=>n.id===this.page);
+    document.getElementById('dcfNav').innerHTML=this.NAV.map((s,i)=>`
+      ${s.group?`<div class="dcf-nav-section">${s.group}</div>`:''}
+      <div class="dcf-nav-item${this.page===s.id?' active':''}" onclick="DCF.navigate('${s.id}')">
+        <span>${s.icon}</span>
+        <span style="flex:1">${s.label}</span>
+        ${i<cur?'<span class="done-mark">✓</span>':''}
+      </div>`).join('');
+  },
+
+  updateSidebar(){
+    const {ev}=this.calcEV();
+    const eq=ev-(this.ibdC+this.ibdNC-this.cash);
+    document.getElementById('sidebarEQ').textContent=this.fm(eq);
+    document.getElementById('sidebarEV').textContent=this.fm(ev);
+    document.getElementById('tabEqBadge').textContent=this.fm(eq);
+  },
+
+  navBtns(prev,next,nextLabel){
+    return`<div class="dc-nav-row">
+      ${prev?`<button class="dc-btn secondary" onclick="DCF.navigate('${prev}')">← 戻る</button>`:'<div></div>'}
+      ${next?`<button class="dc-btn primary" onclick="DCF.navigate('${next}')">${nextLabel||'次へ →'}</button>`:''}
+    </div>`;
+  },
+
+  inp(key,val,opts={}){
+    const isAuto=opts.auto&&this.seeded;
+    return`<div class="dc-input-row">
+      ${isAuto?'<span class="dc-auto">AUTO</span>':''}
+      <input type="number" value="${val}" step="${opts.step||1}" ${opts.min!=null?`min="${opts.min}"`:''}
+        class="${isAuto?'auto':''}"
+        onchange="DCF.set('${key}',parseFloat(this.value)||0);DCF.updateSidebar()"
+        style="width:${opts.w||'100%'};font-size:13px;border:.5px solid var(--border2);border-radius:var(--r);padding:6px 9px;background:${isAuto?'var(--teal-l)':'var(--bg)'};color:var(--text);outline:none">
+      ${opts.suffix?`<span class="dc-suffix">${opts.suffix}</span>`:''}
+    </div>`;
+  },
+
+  set(key,val){
+    // Support dot notation e.g. 'compsEBITDA.lo'
+    const parts=key.split('.');
+    if(parts.length===2) this[parts[0]][parts[1]]=val;
+    else this[key]=val;
+  },
+
+  // ── Page renderers ───────────────────────────────────────
+  renderPage(){
+    const main=document.getElementById('dcfMain');
+    const pages={
+      upload:()=>this.pageUpload(),
+      history:()=>this.pageHistory(),
+      seed:()=>this.pageSeed(),
+      revenue:()=>this.pageRevenue(),
+      cost:()=>this.pageCost(),
+      capex:()=>this.pageCapex(),
+      wc:()=>this.pageWC(),
+      wacc:()=>this.pageWACC(),
+      tv:()=>this.pageTV(),
+      result:()=>this.pageResult(),
+    };
+    main.innerHTML=(pages[this.page]||pages.upload)();
+  },
+
+  // PAGE: Upload
+  pageUpload(){
+    return`<div class="dc-sec">書類アップロード（任意）</div>
+    <div class="dc-desc">帝国データバンク調査書・有価証券報告書・税務申告書などをアップロードすると、過去実績を自動抽出します（Claude API）。</div>
+    ${['🏦  帝国データバンク調査書','📄  有価証券報告書 / EDINET開示書類','📋  税務申告書（法人税申告書・別表）','📊  決算報告書（税理士作成）'].map(t=>`
+      <div class="dc card" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:8px;cursor:pointer" onclick="DCF.handleUpload()">
+        <span style="font-size:13px;color:var(--text);font-weight:500">${t}</span>
+        <span style="font-size:11px;color:var(--teal);border:.5px solid var(--teal-m);border-radius:5px;padding:3px 10px">選択</span>
+      </div>`).join('')}
+    <input type="file" id="dcfFileInput" accept=".pdf,image/*" style="display:none" onchange="DCF.onFileSelect(this)">
+    <div class="dc-warn" style="margin-top:8px">⚠ スキップしても構いません。次の画面で直接数値を入力できます。</div>
+    ${this.navBtns(null,'history','スキップして手動入力 →')}`;
+  },
+
+  handleUpload(){document.getElementById('dcfFileInput').click();},
+  onFileSelect(el){
+    if(!el.files[0])return;
+    alert('書類を受け取りました。Claude APIによる抽出機能は実装中です。次の画面で数値を確認・編集してください。');
+    this.navigate('history');
+  },
+
+  // PAGE: History
+  pageHistory(){
+    const h=this.hist, CY=this.CY;
+    const HL=[`FY${CY-2}`,`FY${CY-1}`,`FY${CY}`];
+    const gpRow=h.map(x=>x.rev>0?`${((x.rev-x.cogs)/x.rev*100).toFixed(1)}%`:'—').join('</td><td class="r" style="color:var(--teal);font-weight:700">');
+    const avgGP=this.pc(h.reduce((s,x)=>s+(x.rev-x.cogs)/x.rev,0)/3);
+    const dso=(h.reduce((s,x)=>s+x.ar/x.rev*365,0)/3).toFixed(0);
+    const dio=(h.reduce((s,x)=>s+x.inv/x.cogs*365,0)/3).toFixed(0);
+    const dpo=(h.reduce((s,x)=>s+x.ap/x.cogs*365,0)/3).toFixed(0);
+
+    const mkRow=(label,key,step,hi,readOnly)=>
+      `<tr${hi?' class="hi"':''}>
+        <td style="font-size:12px;color:${hi?'var(--teal)':'var(--text2)'};${hi?'font-weight:700':''}">${label}</td>
+        ${h.map((x,i)=>readOnly
+          ?`<td class="r" style="color:var(--teal);font-weight:700">${readOnly(x)}</td>`
+          :`<td><input type="number" value="${x[key]}" step="${step}" style="width:80px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:4px 7px;background:var(--bg)" onchange="DCF.hist[${i}].${key}=parseFloat(this.value)||0;DCF.renderPage()"></td>`
+        ).join('')}
+        ${readOnly
+          ?`<td class="r" style="font-size:11px;color:var(--text3)">${hi?avgGP:''}</td>`
+          :`<td class="r" style="font-size:11px;color:var(--text3)">${key==='sga'?this.pc(h.reduce((s,x)=>s+x.sga/x.rev,0)/3):key==='rev'?this.gf(Math.pow(h[2].rev/h[0].rev,0.5)-1):this.fm(h.reduce((s,x)=>s+x[key],0)/3)}</td>`}
+      </tr>`;
+
+    return`<div class="dc-sec">過去実績入力</div>
+    <div class="dc-desc">直近3期の財務数値を入力。GPマージンはCOGSから自動計算、販管費は合計額で入力（固定/変動の分解は自動推定）。</div>
+    <div class="dc"><div class="dc-title">損益計算書（P&L）実績</div>
+      <div class="dc-info">販管費は合計額のみ入力してください。固定費/変動費への分解は「自動推計」ステップで最小二乗法により自動計算します。</div>
+      <div style="overflow-x:auto">
+        <table class="dc-tbl">
+          <thead><tr><th>項目</th>${HL.map(y=>`<th class="r">${y}</th>`).join('')}<th class="r">CAGR/平均</th></tr></thead>
+          <tbody>
+            ${mkRow('売上高（百万円）','rev',5,true)}
+            ${mkRow('売上原価 COGS（百万円）','cogs',5,false)}
+            <tr style="background:#F8FBF9">
+              <td style="font-size:12px;color:var(--teal);font-weight:600">↳ GPマージン（自動計算）<br><span style="font-size:10px;font-weight:400;color:var(--text3)">=（売上−COGS）÷売上</span></td>
+              <td class="r" style="color:var(--teal);font-weight:700">${gpRow}</td>
+              <td class="r" style="color:var(--teal);font-weight:700;font-size:11px">${avgGP}</td>
+            </tr>
+            ${mkRow('販管費合計 SGA（百万円・D&A除く）','sga',5,false)}
+            ${mkRow('D&A（百万円）','da',1,false)}
+            ${mkRow('Capex（百万円）','capex',1,false)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="dc"><div class="dc-title">貸借対照表（BS）実績 — 運転資本・資本構成</div>
+      <div style="overflow-x:auto">
+        <table class="dc-tbl">
+          <thead><tr><th>項目</th>${HL.map(y=>`<th class="r">${y}</th>`).join('')}<th class="r">回転日数/直近</th></tr></thead>
+          <tbody>
+            ${[['売掛金（AR）','ar',`DSO: ${dso}日（平均）`],['棚卸資産','inv',`DIO: ${dio}日（平均）`],['買掛金（AP）','ap',`DPO: ${dpo}日（平均）`],['有利子負債','ibd',`直近: ${this.fm(h[2].ibd)}`],['純資産','equity',`直近: ${this.fm(h[2].equity)}`]].map(([l,k,stat])=>`
+              <tr>
+                <td style="font-size:12px"><span style="color:var(--text)">${l}</span><br><span style="font-size:10px;color:var(--teal)">${stat}</span></td>
+                ${h.map((x,i)=>`<td><input type="number" value="${x[k]}" step="5" style="width:80px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:4px 7px;background:var(--bg)" onchange="DCF.hist[${i}].${k}=parseFloat(this.value)||0;DCF.renderPage()"></td>`).join('')}
+                <td class="r" style="font-size:11px;color:var(--text3)">—</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    ${this.navBtns('upload','seed','自動推計へ →')}`;
+  },
+
+  // PAGE: Seed
+  pageSeed(){
+    this.computeReg();
+    const r=this.reg, CY=this.CY;
+    const h=this.hist;
+    return`<div class="dc-sec">自動推計</div>
+    <div class="dc-desc">過去実績のトレンドから予測パラメータを自動生成します。実行後に各ページで個別修正できます。</div>
+    <div class="dc" style="background:var(--teal-l);border-color:var(--teal-m)">
+      <div class="dc-grid3">
+        ${[['収益CAGR',this.gf(r.cagr),'成長率の起点'],['平均GPマージン',this.pc(r.gpM/100),'売上原価から逆算'],[`DSO/DIO/DPO`,`${Math.round(r.avgDSO)}/${Math.round(r.avgDIO)}/${Math.round(r.avgDPO)}日`,'CCC設定に反映'],['平均Capex',this.fm(r.avgCapex),'設備投資に適用'],['直近D&A',this.fm(r.lastDA),'D&Aに設定'],['直近IBD/純資産',`${this.fm(r.lastIBD)}/${this.fm(r.lastEquity)}`,'WACC資本構成']].map(([t,v,s])=>`
+          <div style="background:var(--bg);border:.5px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">${t}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--teal)">${v}</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px">${s}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="dc dc-accent" style="margin-bottom:12px">
+        <div class="dc-title">📐 販管費の固定費/変動費 分解（最小二乗回帰）</div>
+        <div class="dc-reg-grid">
+          <div class="dc-reg-box"><div class="dc-reg-label">推定固定費</div><div class="dc-reg-val">${this.fm(r.fixF)}</div><div style="font-size:10px;color:var(--text2)">百万円/年</div></div>
+          <div class="dc-reg-box"><div class="dc-reg-label">推定変動費率</div><div class="dc-reg-val">${r.varR.toFixed(1)}%</div><div style="font-size:10px;color:var(--text2)">売上高対比</div></div>
+          <div class="dc-reg-box${r.r2<0.6?' warn':''}"><div class="dc-reg-label">R²（当てはまり）</div><div class="dc-reg-val${r.r2<0.6?' warn':''}" style="color:${r.r2>=0.8?'var(--teal)':'var(--amber-d)'}">${(r.r2*100).toFixed(0)}%</div><div style="font-size:10px;color:var(--text2)">${r.r2>=0.8?'高精度':'参考値'}</div></div>
+        </div>
+        <table class="dc-tbl" style="margin-bottom:0">
+          <thead><tr><th>期</th><th class="r">実績SGA</th><th class="r">推計SGA</th><th class="r">差異</th></tr></thead>
+          <tbody>${h.map((x,i)=>{const est=r.fixF+r.varR/100*x.rev;const diff=x.sga-est;return`<tr><td>FY${CY-2+i}</td><td class="r">${this.fm(x.sga)}</td><td class="r" style="color:var(--teal)">${this.fm(est)}</td><td class="r" style="color:${Math.abs(diff)>x.sga*0.1?'var(--amber-d)':'var(--text3)'}">${diff>=0?'+':''}${this.fm(diff)}</td></tr>`;}).join('')}</tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--bg);border:.5px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">推計後に自動セットされる項目 <span class="dc-auto">AUTO</span></div>
+        ${[['売上成長率（Y1→Y5）',r.projG.slice(0,5).map(g=>(g*100).toFixed(1)).join('→')+'%'],['GPマージン',this.pc(r.gpM/100)],['固定販管費',this.fm(r.fixF)+'/年'],['変動販管費率',r.varR.toFixed(1)+'%'],['DSO/DIO/DPO',`${Math.round(r.avgDSO)}/${Math.round(r.avgDIO)}/${Math.round(r.avgDPO)}日`]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:.5px solid var(--border);font-size:12px">
+            <span style="color:var(--text2)">${k}</span>
+            <span style="color:var(--teal);font-weight:600">${v}</span>
+          </div>`).join('')}
+      </div>
+
+      <button class="dc-btn seed" onclick="DCF.runSeed()">✦ 自動推計を実行して予測パラメータへ進む →</button>
+      ${this.seeded?'<div style="text-align:center;font-size:11px;color:var(--teal-m);margin-top:6px">✓ 推計済み — 各ページで個別修正できます</div>':''}
+    </div>
+    <div class="dc-nav-row">
+      <button class="dc-btn secondary" onclick="DCF.navigate('history')">← 戻る</button>
+      <button class="dc-btn secondary" onclick="DCF.navigate('revenue')">スキップ →</button>
+    </div>`;
+  },
+
+  // PAGE: Revenue
+  pageRevenue(){
+    const YR=Array.from({length:this.projYears},(_,i)=>`Y${i+1}`);
+    const segs=this.segments;
+    return`<div class="dc-sec">売上・GPマージン</div>
+    <div class="dc-desc">セグメントごとに製品名・売上高・GPマージンを設定します。</div>
+    <div class="dc"><div class="dc-title">予測年数</div>
+      <div class="dc-pills">${[3,4,5,6,7].map(n=>`<button class="dc-pill${this.projYears===n?' on':''}" onclick="DCF.projYears=${n};DCF.renderPage()">${n}年</button>`).join('')}</div>
+    </div>
+    ${segs.map((seg,si)=>`
+      <div class="dc">
+        <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">製品名 / サービス名</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <input value="${seg.name}" onchange="DCF.segments[${si}].name=this.value"
+            style="flex:1;font-size:14px;font-weight:600;border:none;border-bottom:1.5px solid rgba(15,110,86,.4);padding:4px 2px;outline:none;background:transparent;color:var(--text)">
+          <div style="display:flex;border:.5px solid var(--border2);border-radius:6px;overflow:hidden">
+            ${['direct','unit'].map((m,mi)=>`<button onclick="DCF.segments[${si}].mode='${m}';DCF.renderPage()"
+              style="padding:4px 10px;font-size:11px;border:none;cursor:pointer;background:${seg.mode===m?'var(--teal)':'var(--bg)'};color:${seg.mode===m?'#fff':'var(--text2)'}">${mi===0?'直接入力':'単価×個数'}</button>`).join('')}
+          </div>
+          ${segs.length>1?`<button onclick="DCF.segments.splice(${si},1);DCF.renderPage()" style="background:none;border:none;color:var(--amber-d);cursor:pointer;font-size:18px">×</button>`:''}
+        </div>
+        <div style="background:linear-gradient(135deg,var(--teal-l),#F0FFF8);border:.5px solid var(--teal-m);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--teal);margin-bottom:6px">📊 GPマージン（このセグメント固有）${this.seeded&&si===0?'<span class="dc-auto">AUTO</span>':''}</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="flex:1"><input type="number" value="${seg.gpMargin}" step="0.5" min="0" max="100"
+              class="${this.seeded&&si===0?'auto':''}"
+              onchange="DCF.segments[${si}].gpMargin=parseFloat(this.value)||0;DCF.updateSidebar()"
+              style="width:100%;font-size:13px;border:.5px solid var(--teal-m);border-radius:6px;padding:6px 9px;background:var(--teal-l);color:var(--teal);outline:none">
+            </div>
+            <span style="font-size:12px;color:var(--text2)">COGS率 = <strong>${(100-seg.gpMargin).toFixed(1)}%</strong></span>
+          </div>
+        </div>
+        ${seg.mode==='unit'?`
+          <div class="dc-grid2">
+            <div class="dc-fld"><label>単価（万円）</label><input type="number" value="${seg.unitPrice||0}" step="1" onchange="DCF.segments[${si}].unitPrice=parseFloat(this.value)||0;DCF.updateSidebar()"></div>
+            <div class="dc-fld"><label>数量（件/年）</label><input type="number" value="${seg.qty||0}" step="10" onchange="DCF.segments[${si}].qty=parseFloat(this.value)||0;DCF.updateSidebar()"></div>
+            <div class="dc-fld"><label>単価成長率</label><div class="dc-input-row"><input type="number" value="${seg.priceG||2}" step="0.5" onchange="DCF.segments[${si}].priceG=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+            <div class="dc-fld"><label>数量成長率</label><div class="dc-input-row"><input type="number" value="${seg.qtyG||5}" step="0.5" onchange="DCF.segments[${si}].qtyG=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+          </div>`:`
+          <div style="display:grid;grid-template-columns:${`repeat(${Math.min(this.projYears,5)+1},1fr)`};gap:8px">
+            <div class="dc-fld"><label>基準年売上（百万円）</label><input type="number" value="${seg.baseRev||100}" step="10" onchange="DCF.segments[${si}].baseRev=parseFloat(this.value)||0;DCF.updateSidebar()"></div>
+            ${YR.slice(0,5).map((y,i)=>`<div class="dc-fld"><label>${y}成長率${this.seeded?'<span class="dc-auto">AUTO</span>':''}</label><div class="dc-input-row"><input type="number" value="${(seg.g||[])[i]||5}" step="0.5" class="${this.seeded?'auto':''}" onchange="if(!DCF.segments[${si}].g)DCF.segments[${si}].g=[];DCF.segments[${si}].g[${i}]=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>`).join('')}
+          </div>`}
+      </div>`).join('')}
+    <div style="border:.5px dashed var(--teal-m);border-radius:8px;padding:10px;text-align:center;font-size:13px;color:var(--teal);cursor:pointer;margin-bottom:10px"
+      onclick="DCF.segments.push({id:Date.now(),name:'セグメント'+(DCF.segments.length+1),mode:'direct',baseRev:100,g:[10,8,6,5,4],gpMargin:50});DCF.renderPage()">
+      ＋ セグメントを追加
+    </div>
+    ${this.navBtns('seed','cost','費用構造 →')}`;
+  },
+
+  // PAGE: Cost
+  pageCost(){
+    return`<div class="dc-sec">費用構造</div>
+    <div class="dc-desc">販管費・その他収益・税金を設定します。COGSはGPマージンから自動計算されます。</div>
+    <div class="dc-info">COGSはセグメント別GPマージンから自動計算。ここでは販管費・税金のみ設定します。</div>
+    <div class="dc dc-accent"><div class="dc-title">販管費（SG&A）</div>
+      <div class="dc-grid2">
+        <div class="dc-fld"><label>変動販管費率（売上高対比）${this.seeded?'<span class="dc-auto">AUTO</span>':''}</label>
+          <div class="dc-input-row"><input type="number" value="${this.varSGA}" step="0.5" class="${this.seeded?'auto':''}" onchange="DCF.varSGA=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+        <div class="dc-fld"><label>固定販管費（基準年・百万円）${this.seeded?'<span class="dc-auto">AUTO</span>':''}</label>
+          <input type="number" value="${this.fixSGA}" step="5" class="${this.seeded?'auto':''}" onchange="DCF.fixSGA=parseFloat(this.value)||0;DCF.updateSidebar()"></div>
+      </div>
+      <div class="dc-fld"><label>固定費の年間成長率（インフレ・昇給）</label>
+        <div class="dc-input-row"><input type="number" value="${this.fixSGAG}" step="0.1" onchange="DCF.fixSGAG=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+    </div>
+    <div class="dc dc-accent"><div class="dc-title">その他収益・税金</div>
+      <div class="dc-grid2">
+        <div class="dc-fld"><label>その他収益（補助金等・百万円/年）</label>
+          <input type="number" value="${this.otherInc}" step="1" onchange="DCF.otherInc=parseFloat(this.value)||0;DCF.updateSidebar()"></div>
+        <div class="dc-fld"><label>実効税率</label>
+          <div class="dc-input-row"><input type="number" value="${this.taxRate}" step="0.5" onchange="DCF.taxRate=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+        <input type="checkbox" ${this.taxLoss?'checked':''} id="taxLossChk" onchange="DCF.taxLoss=this.checked;DCF.updateSidebar()" style="width:16px;height:16px;accent-color:var(--teal)">
+        <label for="taxLossChk" style="font-size:12px;color:var(--text2);cursor:pointer">繰越欠損金を考慮（赤字年度税額ゼロ・翌年相殺）</label>
+      </div>
+    </div>
+    ${this.navBtns('revenue','capex','設備投資・D&A →')}`;
+  },
+
+  // PAGE: Capex
+  pageCapex(){
+    const YR=Array.from({length:this.projYears},(_,i)=>`Y${i+1}`);
+    const daByYear=Array.from({length:this.projYears},(_,yi)=>{
+      let da=this.exAssets.reduce((s,a)=>s+(yi<(a.remYrs||0)?(a.annDep||0):0),0);
+      this.newCapex.forEach(c=>{if(yi>=(c.year-1))da+=(c.cost||0)*(c.depRate||20)/100;});
+      return da;
+    });
+    const capByYear=Array.from({length:this.projYears},(_,yi)=>
+      this.newCapex.filter(c=>c.year===yi+1).reduce((s,c)=>s+(c.cost||0),0));
+    return`<div class="dc-sec">設備投資・D&A</div>
+    <div class="dc-desc">資産スケジュールから減価償却費を年次自動計算します。</div>
+    <div class="dc dc-accent"><div class="dc-title">① 既存資産（BSのNBVから）</div>
+      <table class="dc-tbl" style="margin-bottom:8px"><thead><tr><th>資産名</th><th class="r">NBV（百万円）</th><th class="r">年間D&A${this.seeded?'<span class="dc-auto">AUTO</span>':''}</th><th class="r">残存年数</th><th></th></tr></thead>
+      <tbody>${this.exAssets.map((a,ai)=>`<tr>
+        <td><input value="${a.name}" onchange="DCF.exAssets[${ai}].name=this.value" style="border:none;border-bottom:.5px solid var(--border);outline:none;font-size:12px;width:120px;background:transparent;color:var(--text)"></td>
+        <td><input type="number" value="${a.nbv}" step="10" onchange="DCF.exAssets[${ai}].nbv=parseFloat(this.value)||0;DCF.renderPage()" style="width:75px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--bg)"></td>
+        <td><input type="number" value="${a.annDep}" step="1" class="${this.seeded?'auto':''}" onchange="DCF.exAssets[${ai}].annDep=parseFloat(this.value)||0;DCF.renderPage()" style="width:75px;font-size:12px;border:.5px solid ${this.seeded?'var(--teal-m)':'var(--border)'};border-radius:5px;padding:3px 6px;background:${this.seeded?'var(--teal-l)':'var(--bg)'}"></td>
+        <td><input type="number" value="${a.remYrs}" step="1" min="0" onchange="DCF.exAssets[${ai}].remYrs=parseFloat(this.value)||0;DCF.renderPage()" style="width:55px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--bg)"></td>
+        <td><button onclick="DCF.exAssets.splice(${ai},1);DCF.renderPage()" style="background:none;border:none;color:var(--amber-d);cursor:pointer">×</button></td>
+      </tr>`).join('')}</tbody></table>
+      <button class="dc-btn secondary" onclick="DCF.exAssets.push({id:Date.now(),name:'既存資産',nbv:0,annDep:0,remYrs:3});DCF.renderPage()">＋ 既存資産を追加</button>
+    </div>
+    <div class="dc dc-accent"><div class="dc-title">② 新規Capex計画</div>
+      <table class="dc-tbl" style="margin-bottom:8px"><thead><tr><th>投資名</th><th class="r">実施年</th><th class="r">投資額${this.seeded?'<span class="dc-auto">AUTO</span>':''}</th><th class="r">償却率（定率法）</th><th></th></tr></thead>
+      <tbody>${this.newCapex.map((c,ci)=>`<tr>
+        <td><input value="${c.name}" onchange="DCF.newCapex[${ci}].name=this.value" style="border:none;border-bottom:.5px solid var(--border);outline:none;font-size:12px;width:120px;background:transparent;color:var(--text)"></td>
+        <td><select onchange="DCF.newCapex[${ci}].year=parseInt(this.value);DCF.renderPage()" style="font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--bg);width:70px">${YR.map((y,i)=>`<option value="${i+1}"${c.year===i+1?' selected':''}>${y}</option>`).join('')}</select></td>
+        <td><input type="number" value="${c.cost}" step="10" class="${this.seeded?'auto':''}" onchange="DCF.newCapex[${ci}].cost=parseFloat(this.value)||0;DCF.renderPage()" style="width:75px;font-size:12px;border:.5px solid ${this.seeded?'var(--teal-m)':'var(--border)'};border-radius:5px;padding:3px 6px;background:${this.seeded?'var(--teal-l)':'var(--bg)'}"></td>
+        <td><div class="dc-input-row"><input type="number" value="${c.depRate||20}" step="5" min="5" max="100" onchange="DCF.newCapex[${ci}].depRate=parseFloat(this.value)||20;DCF.renderPage()" style="width:55px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--bg)"><span class="dc-suffix">%</span></div></td>
+        <td><button onclick="DCF.newCapex.splice(${ci},1);DCF.renderPage()" style="background:none;border:none;color:var(--amber-d);cursor:pointer">×</button></td>
+      </tr>`).join('')}</tbody></table>
+      <button class="dc-btn secondary" onclick="DCF.newCapex.push({id:Date.now(),name:'新規投資',year:1,cost:0,depRate:20});DCF.renderPage()">＋ 設備投資を追加</button>
+    </div>
+    <div class="dc"><div class="dc-title">③ D&A・Capex 年次プレビュー（自動計算）</div>
+      <table class="dc-tbl"><thead><tr><th>項目</th>${YR.map(y=>`<th class="r">${y}</th>`).join('')}</tr></thead>
+      <tbody>
+        <tr class="hi"><td>D&A合計（自動計算）</td>${daByYear.map(d=>`<td class="r">${this.fm(d)}</td>`).join('')}</tr>
+        <tr><td>Capex支出</td>${capByYear.map(c=>`<td class="r" style="${c>0?'color:var(--amber-d)':''}">${c>0?this.fm(c):'—'}</td>`).join('')}</tr>
+      </tbody></table>
+    </div>
+    ${this.navBtns('cost','wc','運転資本 →')}`;
+  },
+
+  // PAGE: WC
+  pageWC(){
+    const YR=Array.from({length:this.projYears},(_,i)=>`Y${i+1}`);
+    const fcfs=this.calcFCF();
+    return`<div class="dc-sec">運転資本（CCC方式）</div>
+    <div class="dc-desc">売掛金・棚卸・買掛金の回転日数からΔNWCを自動計算します。</div>
+    <div class="dc" style="background:var(--teal-l);border-color:var(--teal-m)">
+      <div class="dc-grid3">
+        ${[['DSO（売掛金回転日数）','dso',this.dso,'var(--teal-l)','var(--teal-m)'],
+           ['DIO（棚卸資産回転日数）','dio',this.dio,'var(--amber-l)','rgba(99,56,6,.3)'],
+           ['DPO（買掛金支払サイト）','dpo',this.dpo,'#FEF2EF','rgba(121,31,31,.3)']].map(([l,k,v,bg,bc])=>`
+          <div style="background:${bg};border:.5px solid ${bc};border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">${l}${this.seeded?'<span class="dc-auto">AUTO</span>':''}</div>
+            <div class="dc-input-row"><input type="number" value="${v}" step="5" min="0" class="${this.seeded?'auto':''}"
+              onchange="DCF.${k}=parseFloat(this.value)||0;DCF.renderPage()"
+              style="flex:1;font-size:13px;border:.5px solid ${bc};border-radius:6px;padding:5px 8px;background:var(--bg);color:var(--text);outline:none">
+            <span class="dc-suffix">日</span></div>
+          </div>`).join('')}
+      </div>
+      <div style="background:var(--bg);border:.5px solid var(--teal-m);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--teal);font-weight:600">
+        CCC = DSO + DIO − DPO = ${this.dso+this.dio-this.dpo}日
+        ${this.seeded?`<span style="color:var(--text3);font-weight:400;margin-left:10px">過去平均: ${Math.round(this.reg?.avgDSO+this.reg?.avgDIO-this.reg?.avgDPO||0)}日</span>`:''}
+      </div>
+    </div>
+    <div class="dc"><div class="dc-title">期首NWC残高（百万円）</div>
+      <div class="dc-fld"><label>基準年NWC（BSの直近残高。ΔWC計算の起点）</label>
+        <input type="number" value="${this.wcBase}" step="10" onchange="DCF.wcBase=parseFloat(this.value)||0;DCF.renderPage()"></div>
+    </div>
+    <div class="dc"><div class="dc-title">ΔNWC 年次プレビュー（正＝NWC増加 → FCFで控除）</div>
+      <div style="overflow-x:auto"><table class="dc-tbl">
+        <thead><tr><th>項目</th><th class="r">期首</th>${YR.map(y=>`<th class="r">${y}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr><td>売掛金（AR）</td><td class="r">—</td>${fcfs.map(r=>`<td class="r">${this.fm(r.nwc)}</td>`).join('')}</tr>
+          <tr class="hi"><td>NWC合計</td><td class="r">${this.fm(this.wcBase)}</td>${fcfs.map(r=>`<td class="r">${this.fm(r.nwc)}</td>`).join('')}</tr>
+          <tr><td style="font-weight:600">ΔNWC（＋増加=FCFで控除）</td><td class="r">—</td>
+            ${fcfs.map(r=>{const v=r.delta;return`<td class="r" style="color:${v>0?'var(--amber-d)':v<0?'var(--teal)':'var(--text3)'}";font-weight:600">${Math.abs(v)<0.05?'—':(v>0?'+':'')+this.fm(v)}</td>`}).join('')}
+          </tr>
+        </tbody>
+      </table></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">正（＋）= NWC増加（キャッシュ流出）　負（−）= NWC減少（キャッシュ流入）</div>
+    </div>
+    ${this.navBtns('capex','wacc','WACC →')}`;
+  },
+
+  // PAGE: WACC
+  pageWACC(){
+    const totalCap=this.actualIBD+this.actualEQ;
+    const dRatio=totalCap>0?this.actualIBD/totalCap*100:0;
+    const ke=this.rf+this.erp+this.sp+this.sr;
+    const buildupW=ke*(1-dRatio/100)+this.kd*(1-this.taxRate/100)*dRatio/100;
+    return`<div class="dc-sec">WACC・資本構成</div>
+    <div class="dc-desc">割引率と資本構成を設定します。ビルドアップ法では非上場企業のリスクを積み上げ推計します。</div>
+    <div class="dc"><div class="dc-title">WACC入力方式</div>
+      <div class="dc-pills">
+        <button class="dc-pill${!this.useBuildup?' on':''}" onclick="DCF.useBuildup=false;DCF.renderPage()">直接入力</button>
+        <button class="dc-pill${this.useBuildup?' on':''}" onclick="DCF.useBuildup=true;DCF.renderPage()">ビルドアップ法</button>
+      </div>
+      ${!this.useBuildup?`
+        <div class="dc-fld"><label>WACC（非上場中小企業：一般的に12〜20%）</label>
+          <div class="dc-input-row"><input type="number" value="${this.wacc}" step="0.5" onchange="DCF.wacc=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>`:`
+        <div class="dc-grid2">
+          ${[['リスクフリーレート（10年国債）','rf',this.rf,0.1],['ERP（Damodaran参照）','erp',this.erp,0.5],['サイズプレミアム（Duff & Phelps）','sp',this.sp,0.5],['固有リスクプレミアム（依存度・競合）','sr',this.sr,0.5]].map(([l,k,v,st])=>`
+            <div class="dc-fld"><label>${l}</label><div class="dc-input-row"><input type="number" value="${v}" step="${st}" onchange="DCF.${k}=parseFloat(this.value)||0;DCF.renderPage()"><span class="dc-suffix">%</span></div></div>`).join('')}
+        </div>
+        <div style="background:var(--teal-l);border:.5px solid var(--teal-m);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:13px;color:var(--teal)">Ke（株主資本コスト）</span>
+          <span style="font-size:20px;font-weight:700;color:var(--teal);font-family:var(--mono)">${ke.toFixed(2)}%</span>
+        </div>
+        <div style="background:var(--teal-l);border:.5px solid var(--teal-m);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:13px;color:var(--teal)">ビルドアップ WACC</span>
+          <span style="font-size:20px;font-weight:700;color:var(--teal);font-family:var(--mono)">${buildupW.toFixed(2)}%</span>
+        </div>
+        <button class="dc-btn primary" onclick="DCF.wacc=parseFloat(${buildupW.toFixed(2)});DCF.updateSidebar();alert('WACC=${buildupW.toFixed(2)}%を採用しました')">この値をWACCとして採用 →</button>`}
+    </div>
+    <div class="dc dc-accent"><div class="dc-title">資本構成（BSの実額から自動計算）</div>
+      <div class="dc-info">貸借対照表の実数値を入力すると負債比率が自動計算されます。</div>
+      <div class="dc-grid2">
+        <div class="dc-fld"><label>有利子負債合計（百万円）${this.seeded?'<span class="dc-auto">AUTO</span>':''}</label>
+          <input type="number" value="${this.actualIBD}" step="10" class="${this.seeded?'auto':''}" onchange="DCF.actualIBD=parseFloat(this.value)||0;DCF.renderPage()"></div>
+        <div class="dc-fld"><label>純資産（百万円）${this.seeded?'<span class="dc-auto">AUTO</span>':''}</label>
+          <input type="number" value="${this.actualEQ}" step="10" class="${this.seeded?'auto':''}" onchange="DCF.actualEQ=parseFloat(this.value)||0;DCF.renderPage()"></div>
+      </div>
+      <div class="dc-fld"><label>税引前負債コスト（Kd）</label>
+        <div class="dc-input-row"><input type="number" value="${this.kd}" step="0.25" onchange="DCF.kd=parseFloat(this.value)||0;DCF.renderPage()"><span class="dc-suffix">%</span></div></div>
+      <div class="dc-grid3" style="margin-top:10px">
+        ${[['有利子負債（D）',`¥${this.actualIBD}M`,false],['純資産（E）',`¥${this.actualEQ}M`,false],['D/(D+E)',`${dRatio.toFixed(1)}%`,true]].map(([l,v,hi])=>`
+          <div style="background:${hi?'var(--teal-l)':'var(--bg2)'};border:.5px solid ${hi?'var(--teal-m)':'var(--border)'};border-radius:6px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:var(--text3)">${l}</div>
+            <div style="font-size:15px;font-weight:700;color:${hi?'var(--teal)':'var(--text)'};">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    ${this.navBtns('wc','tv','残存価値 →')}`;
+  },
+
+  // PAGE: TV
+  pageTV(){
+    const wAccWarn=this.wacc<=this.tgRate&&this.tvMethod==='perpetual';
+    return`<div class="dc-sec">残存価値・予測期間</div>
+    <div class="dc-desc">予測期間終了後の価値を3手法から選択します。</div>
+    <div class="dc"><div class="dc-pills">
+      ${[['perpetual','①永久成長率法（Gordon Growth）'],['ebitda','②EBITDAマルチプル法']].map(([v,l])=>`
+        <button class="dc-pill${this.tvMethod===v?' on':''}" onclick="DCF.tvMethod='${v}';DCF.renderPage()">${l}</button>`).join('')}
+    </div>
+    ${this.tvMethod==='perpetual'?`
+      <div class="dc-fld"><label>ターミナル成長率（日本：0〜2%推奨）</label>
+        <div class="dc-input-row"><input type="number" value="${this.tgRate}" step="0.25" onchange="DCF.tgRate=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">%</span></div></div>
+      ${this.tgRate>3?'<div class="dc-warn">⚠ ターミナル成長率3%超は楽観的すぎる可能性があります。</div>':''}
+      ${wAccWarn?'<div class="dc-warn">⚠ WACC ≦ 成長率の場合、TV計算が発散します。WACCを引き上げてください。</div>':''}`:`
+      <div class="dc-fld"><label>EV/EBITDA 想定マルチプル（業界相場・Trading Comps中央値を参照）</label>
+        <div class="dc-input-row"><input type="number" value="${this.tvMult}" step="0.5" min="1" onchange="DCF.tvMult=parseFloat(this.value)||0;DCF.updateSidebar()"><span class="dc-suffix">×</span></div></div>`}
+    </div>
+    ${this.navBtns('wacc','result','計算結果 →')}`;
+  },
+
+  // PAGE: Result
+  pageResult(){
+    this.pullCompsData();
+    const {ev,pvF,pvTV,fcfs,last}=this.calcEV();
+    const netDebt=this.ibdC+this.ibdNC-this.cash;
+    const baseEQ=ev-netDebt;
+    const bearEQ=this.getEquity(+this.bearWaccAdj,-this.bearTgAdj);
+    const bullEQ=this.getEquity(-this.bullWaccAdj,+this.bullTgAdj);
+    const perpEQ=baseEQ;
+    const multEQ=pvF+(last.ebitda||0)*this.tvMult/Math.pow(1+this.wacc/100,this.projYears)-netDebt;
+    const tvRatio=isFinite(pvTV)&&ev?pvTV/ev:NaN;
+
+    // Comps equity
+    const ebitda=this.compsEBITDA.ebitda??Math.max(0,(this.hist[2].rev-this.hist[2].cogs-this.hist[2].sga+this.hist[2].da));
+    const bv=this.compsPBR.bv??this.hist[2].equity;
+    const earn=this.compsPER.earnings??0;
+    const cEBlo=this.compsEBITDA.lo*ebitda-netDebt, cEBmed=this.compsEBITDA.med*ebitda-netDebt, cEBhi=this.compsEBITDA.hi*ebitda-netDebt;
+    const cPRlo=this.compsPER.lo*earn, cPRmed=this.compsPER.med*earn, cPRhi=this.compsPER.hi*earn;
+    const cPBlo=this.compsPBR.lo*bv, cPBmed=this.compsPBR.med*bv, cPBhi=this.compsPBR.hi*bv;
+
+    // Football axis
+    const allV=[bearEQ,baseEQ,bullEQ,perpEQ,multEQ,cEBlo,cEBhi,cPRlo,cPRhi,cPBlo,cPBhi].filter(v=>isFinite(v)&&v>0);
+    const axMin=Math.max(0,Math.min(...allV)*0.88), axMax=Math.max(...allV)*1.1, axR=axMax-axMin||1;
+    const toX=v=>Math.max(0,Math.min(100,(v-axMin)/axR*100));
+    const axLabels=Array.from({length:5},(_,i)=>axMin+axR*i/4);
+
+    const ptBar=(label,sub,eq,color,base=false)=>{
+      const x=toX(eq);
+      return`<div class="dc-fb-row">
+        <div class="dc-fb-label"><div class="dc-fb-name${base?' base':''}">${label}</div>${sub?`<div class="dc-fb-sub">${sub}</div>`:''}</div>
+        <div class="dc-fb-track${base?' base':''}" style="flex:1">
+          <div class="dc-fb-dot${base?' base':''}" style="left:${x}%;background:${color}"></div>
+          <div class="dc-fb-val" style="left:${x}%;${x>80?'transform:translateX(-110%) translateY(-50%)':x<15?'transform:translateX(5%) translateY(-50%)':'transform:translateX(-50%) translateY(-50%)'};color:${color}">${this.fm(eq)}</div>
+        </div>
+      </div>`;
+    };
+
+    const rgBar=(label,sub,lo,med,hi,color)=>{
+      const xlo=toX(lo),xm=toX(med),xhi=toX(hi);
+      return`<div class="dc-fb-row">
+        <div class="dc-fb-label"><div class="dc-fb-name">${label}</div>${sub?`<div class="dc-fb-sub">${sub}</div>`:''}</div>
+        <div class="dc-fb-track" style="flex:1">
+          <div class="dc-fb-range" style="left:${xlo}%;width:${Math.max(xhi-xlo,0.5)}%;background:${color}"></div>
+          <div class="dc-fb-tick" style="left:${xlo}%;background:${color}"></div>
+          <div class="dc-fb-tick" style="left:${xhi}%;background:${color}"></div>
+          <div class="dc-fb-dot" style="left:${xm}%;background:${color}"></div>
+          <div style="position:absolute;left:${xlo}%;top:2px;font-size:9px;color:${color};opacity:.8;transform:translateX(-50%);white-space:nowrap">${this.fm(lo)}</div>
+          <div style="position:absolute;left:${xhi}%;top:2px;font-size:9px;color:${color};opacity:.8;transform:translateX(-100%);white-space:nowrap">${this.fm(hi)}</div>
+          <div style="position:absolute;left:${xm}%;bottom:2px;font-size:10px;font-weight:700;color:${color};background:rgba(255,255,255,.9);padding:0 3px;border-radius:2px;white-space:nowrap;transform:translateX(${xm>70?'-100%':'-50%'})">${this.fm(med)}</div>
+        </div>
+      </div>`;
+    };
+
+    // Overlap zone
+    const olLo=Math.max(bearEQ,cEBlo), olHi=Math.min(bullEQ,cEBhi);
+    const hasOverlap=olHi>olLo&&isFinite(olLo)&&isFinite(olHi);
+
+    // Sensitivity
+    const sensW=[-2,-1,0,1,2].map(d=>this.wacc+d);
+    const sensT=[-1,-0.5,0,0.5,1].map(d=>this.tgRate+d);
+    const scColor=eq=>{
+      if(!isFinite(eq)||isNaN(eq))return{bg:'#FEF2EF',col:'#C84B31'};
+      const r=(eq-baseEQ)/Math.max(Math.abs(baseEQ),1);
+      if(r>0.15)return{bg:'#E8F5EE',col:'#1D6E3F'};
+      if(r>0.05)return{bg:'#F0FBF6',col:'var(--teal-m)'};
+      if(r<-0.15)return{bg:'#FEF2EF',col:'#C84B31'};
+      if(r<-0.05)return{bg:'#FFF8F7',col:'#D97060'};
+      return{bg:'var(--teal-l)',col:'var(--teal)'};
+    };
+
+    const YR=Array.from({length:this.projYears},(_,i)=>`Y${i+1}`);
+    const curTab=this._resultTab||'chart';
+
+    return`
+    <!-- Hero -->
+    <div class="dc-hero">
+      <div class="dc-hero-lbl">株式価値レンジ（DCFバリュエーション）</div>
+      <div class="dc-hero-row">
+        <div class="dc-hero-scen"><div class="dc-hero-name">保守的（WACC+${this.bearWaccAdj}%）</div>
+          <div class="dc-hero-side-val" style="color:#F0A090">${this.fm(bearEQ)}</div></div>
+        <div class="dc-hero-arrow">‹‹</div>
+        <div class="dc-hero-scen" style="text-align:center">
+          <div class="dc-hero-name" style="color:var(--teal-m);font-weight:700">中位（ベース）</div>
+          <div class="dc-hero-base-val">${this.fm(baseEQ)}</div>
+          <div class="dc-hero-sub">WACC ${this.wacc}% / TG ${this.tgRate}%</div>
+        </div>
+        <div class="dc-hero-arrow">>></div>
+        <div class="dc-hero-scen"><div class="dc-hero-name">楽観的（WACC−${this.bullWaccAdj}%）</div>
+          <div class="dc-hero-side-val" style="color:#80D8B0">${this.fm(bullEQ)}</div></div>
+      </div>
+    </div>
+
+    <!-- WACC Sliders -->
+    <div class="dc"><div class="dc-title">シナリオWACC幅の調整</div>
+      <div class="dc-grid2">
+        ${[['保守的：WACC上乗せ幅','#C84B31','bearWaccAdj',this.bearWaccAdj,this.wacc+this.bearWaccAdj],
+           ['楽観的：WACC引下げ幅','#1D6E3F','bullWaccAdj',this.bullWaccAdj,this.wacc-this.bullWaccAdj]].map(([l,col,key,v,res])=>`
+          <div class="dc-slider-row">
+            <div class="dc-slider-header"><span class="dc-slider-label">${l}</span><span class="dc-slider-val" style="color:${col}">±${v.toFixed(1)}%</span></div>
+            <input type="range" class="dc-range" min="0.5" max="5" step="0.5" value="${v}" style="accent-color:${col}"
+              oninput="DCF.${key}=parseFloat(this.value);DCF.renderPage()">
+            <div class="dc-slider-footer"><span>+0.5%</span><span style="color:${col};font-weight:600">→ 適用後WACC: ${res.toFixed(1)}%</span><span>+5%</span></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dc-subtabs">
+      ${[['chart','フットボールチャート'],['fcf','FCF予測'],['sens','感応度（株式価値）']].map(([id,l])=>`
+        <button class="dc-subtab${curTab===id?' on':''}" onclick="DCF._resultTab='${id}';DCF.renderPage()">${l}</button>`).join('')}
+    </div>
+
+    ${curTab==='chart'?`
+    <!-- Football Chart -->
+    <div class="dc"><div class="dc-title">統合フットボールチャート（DCF + Trading Comps）</div>
+      <div style="background:#F8F4FF;border:.5px solid #C8C1F5;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#5B4FCF">
+        <strong>Trading Compsとの整合：</strong> ピア倍率（EV/EBITDA・PER・PBR）の25th〜75thレンジと対象会社指標を乗じた株式価値をDCFと同一軸で表示。重複ゾーンが最も合理的なバリュエーション域。
+      </div>
+      <!-- Net Debt compact -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;font-size:12px;color:var(--text2)">
+        Net Debt：
+        ${[['現預金','cash',this.cash],['IBD流動','ibdC',this.ibdC],['IBD固定','ibdNC',this.ibdNC]].map(([l,k,v])=>`
+          <span>${l}:&nbsp;<input type="number" value="${v}" step="10" onchange="DCF.${k}=parseFloat(this.value)||0;DCF.renderPage()" style="width:65px;font-size:12px;border:.5px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--bg)"></span>`).join('')}
+        <span style="background:${netDebt>0?'var(--amber-l)':'var(--teal-l)'};border:.5px solid ${netDebt>0?'rgba(99,56,6,.3)':'var(--teal-m)'};border-radius:5px;padding:3px 9px;font-weight:700;color:${netDebt>0?'var(--amber-d)':'var(--teal)'}">ND: ${this.fm(netDebt)}</span>
+      </div>
+      <!-- Axis -->
+      <div class="dc-fb-axis" style="padding-left:110px">${axLabels.map(v=>`<div class="dc-fb-axis-val">${this.fm(v)}</div>`).join('')}</div>
+      <!-- DCF -->
+      <div class="dc-fb-sep">DCF — シナリオ感応度（WACC / TG）</div>
+      ${ptBar('保守的',`WACC ${(this.wacc+this.bearWaccAdj).toFixed(1)}%`,bearEQ,'#C84B31')}
+      ${ptBar('中位（ベース）',`WACC ${this.wacc}% / TG ${this.tgRate}%`,baseEQ,'var(--teal)',true)}
+      ${ptBar('楽観的',`WACC ${(this.wacc-this.bullWaccAdj).toFixed(1)}%`,bullEQ,'#1D6E3F')}
+      <div class="dc-fb-sep">DCF — 残存価値手法の比較</div>
+      ${ptBar('永久成長率法',`TG ${this.tgRate}%`,perpEQ,'#2563EB')}
+      ${ptBar('EBITDAマルチプル',`${this.tvMult}×EBITDA`,multEQ,'#7C3AED')}
+      <!-- Comps input & bars -->
+      <div class="dc-fb-sep">Trading Comps（類似企業比較）</div>
+      <div style="background:var(--bg2);border:.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">ピア倍率レンジ入力 ${window.__valioComps?'<span class="dc-src">Comps自動連携</span>':'（Trading Compsから転記）'}</div>
+        <div class="dc-grid3">
+          ${[['EV/EBITDA',['lo',this.compsEBITDA.lo,'compsEBITDA.lo'],['med',this.compsEBITDA.med,'compsEBITDA.med'],['hi',this.compsEBITDA.hi,'compsEBITDA.hi']],
+             ['PER',['lo',this.compsPER.lo,'compsPER.lo'],['med',this.compsPER.med,'compsPER.med'],['hi',this.compsPER.hi,'compsPER.hi']],
+             ['PBR',['lo',this.compsPBR.lo,'compsPBR.lo'],['med',this.compsPBR.med,'compsPBR.med'],['hi',this.compsPBR.hi,'compsPBR.hi']]].map(([title,...fields])=>`
+            <div style="background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:8px 10px">
+              <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">${title}</div>
+              ${fields.map(([l,v,k])=>`<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px"><span style="font-size:10px;color:var(--text3);width:24px">${l}</span>
+                <input type="number" value="${v}" step="0.5" onchange="DCF.set('${k}',parseFloat(this.value)||0);DCF.renderPage()" style="width:60px;font-size:11px;border:.5px solid var(--border);border-radius:4px;padding:3px 5px;background:var(--bg)">
+                <span style="font-size:10px;color:var(--text3)">×</span></div>`).join('')}
+            </div>`).join('')}
+        </div>
+        <div class="dc-grid2" style="margin-top:8px">
+          ${[['直近EBITDA（百万円）',ebitda,'compsEBITDA.ebitda'],['純資産BV（百万円）',bv,'compsPBR.bv']].map(([l,v,k])=>`
+            <div class="dc-fld"><label>${l}</label><input type="number" value="${Math.round(v)}" step="10" onchange="DCF.set('${k}',parseFloat(this.value)||0);DCF.renderPage()"></div>`).join('')}
+        </div>
+      </div>
+      ${ebitda>0?rgBar('EV/EBITDA',`${this.compsEBITDA.lo}〜${this.compsEBITDA.hi}×`,cEBlo,cEBmed,cEBhi,'#D97706'):''}
+      ${earn>0?rgBar('PER',`${this.compsPER.lo}〜${this.compsPER.hi}×`,cPRlo,cPRmed,cPRhi,'#7C3AED'):''}
+      ${bv>0?rgBar('PBR',`${this.compsPBR.lo}〜${this.compsPBR.hi}×`,cPBlo,cPBmed,cPBhi,'#0369A1'):''}
+      ${hasOverlap?`<div class="dc-fb-overlap" style="background:linear-gradient(90deg,transparent ${toX(olLo)}%,var(--teal-l) ${toX(olLo)}%,var(--teal-l) ${toX(olHi)}%,transparent ${toX(olHi)}%)">
+        <div class="dc-fb-overlap-label">✦ DCF × Comps 重複ゾーン: ${this.fm(olLo)}〜${this.fm(olHi)}</div></div>`:''}
+      <!-- Scale -->
+      <div style="padding-left:110px;margin-top:6px"><div style="height:1px;background:var(--border)"></div>
+        <div class="dc-fb-axis">${axLabels.map(v=>`<div class="dc-fb-axis-val">${this.fm(v)}</div>`).join('')}</div>
+      </div>
+    </div>
+    <!-- EV Bridge -->
+    <div class="dc"><div class="dc-title">EV → 株式価値ブリッジ（中位ベース）</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        ${[[this.fm(ev),'企業価値（EV）','var(--teal)',true],['−','','var(--text3)',false],[this.fm(this.ibdC+this.ibdNC),'有利子負債','var(--amber-d)',false],['＋','','var(--text3)',false],[this.fm(this.cash),'現預金','var(--teal-m)',false],['＝','','var(--text3)',false],[this.fm(baseEQ),'株式価値（中位）','var(--teal)',true]].map(([v,l,col,box])=>
+          v==='−'||v==='＋'||v==='＝'
+          ?`<span style="font-size:18px;color:var(--text3);font-weight:300">${v}</span>`
+          :`<div style="background:${box?'var(--teal-l)':'var(--bg2)'};border:.5px solid ${box?'var(--teal-m)':'var(--border)'};border-radius:8px;padding:7px 11px;text-align:center">
+              <div style="font-size:10px;color:var(--text3)">${l}</div>
+              <div style="font-size:${box?'16':'13'}px;font-weight:700;color:${col};font-family:var(--mono)">${v}</div>
+            </div>`).join('')}
+      </div>
+    </div>`:''}
+
+    ${curTab==='fcf'?`
+    <!-- FCF Table -->
+    <div class="dc dc-accent"><div class="dc-title">FCF予測テーブル</div>
+      <div style="overflow-x:auto"><table class="dc-tbl">
+        <thead><tr><th>項目</th>${YR.map(y=>`<th class="r">${y}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${[['売上高',r=>r.rev,false],['粗利益（GP）',r=>r.gp,true],['変動販管費',r=>-r.varS??0,false],['固定販管費',r=>-r.fixS??0,false],['EBITDA',r=>r.ebitda,true],['D&A',r=>-r.da,false],['EBIT',r=>r.ebit,true],['税金',r=>-(r.tax||0),false],['NOPAT',r=>r.nopat,true],['D&A（戻し）',r=>r.da,false],['Capex',r=>-(r.capex||0),false],['ΔNWC（CCC）',r=>-(r.delta||0),false],['FCF',r=>r.fcf,true],['PV（FCF）',r=>r.pv,true]].map(([l,fn,hi])=>`
+            <tr${hi?' class="hi"':''}><td>${l}</td>${fcfs.map(r=>{const v=fn(r);return`<td class="r" style="${v<0&&!hi?'color:var(--amber-d)':''}">${this.fm(v)}</td>`;}).join('')}</tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="dc-sum-grid" style="margin-top:10px">
+        ${[['PV(FCF合計)',this.fm(pvF)],['PV(残存価値)',this.fm(pvTV)+(isFinite(tvRatio)?` / ${this.pc(tvRatio)}`:'')],['企業価値 EV',this.fm(ev)],['株式価値',this.fm(baseEQ)]].map(([l,v],i)=>`
+          <div class="${i>=2?'dc-sum-box hi':'dc-sum-box'}"><div class="dc-sum-label">${l}</div><div class="dc-sum-val">${v}</div></div>`).join('')}
+      </div>
+    </div>`:''}
+
+    ${curTab==='sens'?`
+    <!-- Sensitivity -->
+    <div class="dc"><div class="dc-title">感応度分析（WACC × TG → 株式価値）</div>
+      <div style="overflow-x:auto"><table class="dc-tbl dc-sens">
+        <thead><tr><th>WACC→/TG↓</th>${sensW.map(w=>`<th style="${Math.abs(w-this.wacc)<0.01?'background:var(--teal-l);color:var(--teal)':''}">${w.toFixed(1)}%</th>`).join('')}</tr></thead>
+        <tbody>${sensT.map(t=>`<tr>
+          <td style="${Math.abs(t-this.tgRate)<0.01?'background:var(--teal-l);color:var(--teal)':''};text-align:center;font-weight:600">${t.toFixed(1)}%</td>
+          ${sensW.map(w=>{
+            const eq=this.getEquity(w-this.wacc,t-this.tgRate);
+            const isBase=Math.abs(w-this.wacc)<0.01&&Math.abs(t-this.tgRate)<0.01;
+            const sc=isBase?{bg:'var(--teal-l)',col:'var(--teal)'}:scColor(eq);
+            return`<td class="${isBase?'base-cell':''}" style="background:${isBase?'var(--teal-l)':sc.bg};color:${isBase?'var(--teal)':sc.col};font-weight:${isBase?700:600}">${this.fm(eq)}</td>`;
+          }).join('')}
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;font-size:11px;color:var(--text2)">
+        ${[['#E8F5EE','#1D6E3F','+15%超'],['#F0FBF6','var(--teal-m)','+5〜15%'],['var(--teal-l)','var(--teal)','±5%'],['#FFF8F7','#D97060','-5〜-15%'],['#FEF2EF','#C84B31','-15%超']].map(([bg,col,l])=>`
+          <div style="display:flex;align-items:center;gap:3px"><div style="width:11px;height:11px;background:${bg};border:.5px solid ${col};border-radius:2px"></div><span>${l}</span></div>`).join('')}
+      </div>
+    </div>`:''}
+
+    <div style="background:#FFFDF0;border:.5px solid var(--amber-l);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--amber-d);margin-top:8px">
+      ⚠ 免責：本計算結果はユーザーが入力した仮定に基づく試算です。Valioは特定の価値判断を行うものではありません。金融商品取引法上の投資助言には該当しません。
+    </div>
+    <div style="margin-top:10px"><button class="dc-btn secondary" onclick="DCF.navigate('tv')">← パラメータに戻る</button></div>`;
+  },
+
+  // ── Init ──────────────────────────────────────────────────
+  init(){
+    this.computeReg();
+    this.renderNav();
+    this.renderPage();
+    this.updateSidebar();
+  },
+};
+
+// ── Comps linkage: expose target financials when Comps table renders ──
+// Call this from existing Trading Comps code when table is built:
+// window.__valioComps = { ebitda, netIncome, bv, evEbitdaLo, evEbitdaMed, evEbitdaHi, ... }
+</script>
