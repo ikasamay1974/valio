@@ -2623,8 +2623,8 @@ renderRecent();
 <script>
 // ── Tab switcher ─────────────────────────────────────────────
 function switchTab(t){
-  document.getElementById('tab-comps').style.display = t==='comps'?'':'none';
-  document.getElementById('tab-dcf').style.display   = t==='dcf'?'':'none';
+  document.getElementById('tab-comps').style.display = t==='comps'?'block':'none';
+  document.getElementById('tab-dcf').style.display   = t==='dcf'?'block':'none';
   document.getElementById('tabBtnComps').className = 'tab-btn'+(t==='comps'?' active':'');
   document.getElementById('tabBtnDcf').className   = 'tab-btn'+(t==='dcf'?' active':'');
   if(t==='dcf') DCF.init();
@@ -2793,7 +2793,7 @@ const DCF = {
       const delta=nwc-prevNWC;
       const fcf=nopat+da-capex-delta;
       const pv=fcf/Math.pow(1+wacc,yi+1);
-      return{rev,gp,cogs,ebitda,da,ebit,tax,nopat,capex,delta,fcf,pv,nwc};
+      return{rev,gp,cogs,varS,fixS,ebitda,da,ebit,tax,nopat,capex,delta,fcf,pv,nwc};
     });
   },
 
